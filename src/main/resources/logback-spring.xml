@@ -1,28 +1,28 @@
-<configuration scan="true" scanPeriod="180 seconds">
+<!DOCTYPE xml>
+<configuration scan="true" scanPeriod="20 seconds">
 
-	<springProperty scope="context" name="log.level" source="log.level"/>
-	<springProperty scope="context" name="LOG_HOME" source="log.home"/>
-
-	<!--Console logger-->
-	<appender name="CONSOLE"
+	<springProperty scope="context" name="LOG_PATH" source="logging.path" />
+	<springProperty scope="context" name="LOG_FILE" source="logging.file" />
+	<springProperty scope="context" name="LOG_LEVEL" source="logging.level" />
+    
+    <appender name="CONSOLE"
         class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-        %date{ISO8601} [%thread] %-5level %logger %M - %msg%n
+				%date{ISO8601} [%thread] %-5level %logger %M - %msg%n
             </Pattern>
         </layout>
     </appender>
     
-	<!--File su cui loggare-->
-	<appender name="CALENDAR_API_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<appender name="ROLLING_FILE_LOGGER" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 			<Pattern>
-				%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n
+				%date{ISO8601} [%thread] %-5level %logger %M - %msg%n
 			</Pattern>
 		</encoder>
-		<file>${LOG_HOME}/calendar_application.log</file>
+		<file>${LOG_PATH}/${LOG_FILE}.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/archived/covid_api-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/archived/${LOG_FILE}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <maxFileSize>30MB</maxFileSize>
             <maxHistory>10</maxHistory>
             <totalSizeCap>200MB</totalSizeCap>
@@ -30,24 +30,49 @@
          </rollingPolicy>
 	</appender>
 	
-	<!-- Package da loggare -->
-	<logger name="com.depa" level="${log.level}" additivity="false">
-		<appender-ref ref="CALENDAR_API_LOG" />
+	<logger name="com.perigea" level="${LOG_LEVEL}" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
 		<appender-ref ref="CONSOLE" />
 	</logger>
-	
-	<logger name="org.springframework" level="${log.level}" additivity="false">
-		<appender-ref ref="CALENDAR_API_LOG" />
+		<logger name="com.perigea.tracker" level="${LOG_LEVEL}" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
 		<appender-ref ref="CONSOLE" />
 	</logger>
-
-	<logger name="org.mongodb" level="${log.level}" additivity="false">
-		<appender-ref ref="CALENDAR_API_LOG" />
+	<logger name="springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator" level="off" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
 		<appender-ref ref="CONSOLE" />
 	</logger>
-
-	<root level="${log.level}">
-		<appender-ref ref="CALENDAR_API_LOG" />
+	<logger name="org.springframework.data.mongodb.core.index.ReactiveMongoPersistentEntityIndexCreator" level="off" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
+		<appender-ref ref="CONSOLE" />
+	</logger>		
+	<logger name="org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexCreator" level="off" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER"/>
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="springfox.documentation" level="off" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER"/>
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="org.springframework.beans.factory.support" level="off" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER"/>
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="org.springframework.context.annotation" level="off" additivity="false">	
+		<appender-ref ref="ROLLING_FILE_LOGGER"/>
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="logging.level.org.springframework.boot.autoconfigure" level="error" additivity="false">	
+		<appender-ref ref="ROLLING_FILE_LOGGER"/>
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="org.quartz" level="INFO" additivity="off">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<root level="${LOG_LEVEL}">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
 		<appender-ref ref="CONSOLE" />
 	</root>
+	
 </configuration>

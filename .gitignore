@@ -34,3 +34,4 @@ build/
 
 ## Local properties ##
 *local.properties
+*.gitignore
