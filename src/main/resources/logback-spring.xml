@@ -1,0 +1,53 @@
+<configuration scan="true" scanPeriod="180 seconds">
+
+	<springProperty scope="context" name="log.level" source="log.level"/>
+	<springProperty scope="context" name="LOG_HOME" source="log.home"/>
+
+	<!--Console logger-->
+	<appender name="CONSOLE"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+        %date{ISO8601} [%thread] %-5level %logger %M - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+    
+	<!--File su cui loggare-->
+	<appender name="CALENDAR_API_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n
+			</Pattern>
+		</encoder>
+		<file>${LOG_HOME}/calendar_application.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/archived/covid_api-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>30MB</maxFileSize>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>200MB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+         </rollingPolicy>
+	</appender>
+	
+	<!-- Package da loggare -->
+	<logger name="com.depa" level="${log.level}" additivity="false">
+		<appender-ref ref="CALENDAR_API_LOG" />
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	
+	<logger name="org.springframework" level="${log.level}" additivity="false">
+		<appender-ref ref="CALENDAR_API_LOG" />
+		<appender-ref ref="CONSOLE" />
+	</logger>
+
+	<logger name="org.mongodb" level="${log.level}" additivity="false">
+		<appender-ref ref="CALENDAR_API_LOG" />
+		<appender-ref ref="CONSOLE" />
+	</logger>
+
+	<root level="${log.level}">
+		<appender-ref ref="CALENDAR_API_LOG" />
+		<appender-ref ref="CONSOLE" />
+	</root>
+</configuration>
