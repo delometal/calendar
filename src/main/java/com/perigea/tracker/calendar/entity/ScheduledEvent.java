@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import com.perigea.tracker.calendar.enums.EventStatus;
+import com.perigea.tracker.commons.enums.EventStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

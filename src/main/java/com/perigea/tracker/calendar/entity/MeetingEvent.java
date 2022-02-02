@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import com.perigea.tracker.calendar.enums.CalendarEventType;
+import com.perigea.tracker.commons.enums.CalendarEventType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

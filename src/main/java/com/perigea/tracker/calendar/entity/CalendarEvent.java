@@ -8,8 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.perigea.tracker.calendar.dto.ContactDto;
-import com.perigea.tracker.calendar.enums.CalendarEventType;
+import com.perigea.tracker.commons.dto.EventContactDto;
+import com.perigea.tracker.commons.enums.CalendarEventType;
 
 import lombok.Data;
 
@@ -33,6 +33,6 @@ public abstract class CalendarEvent {
 	
 	// cfr codicePersona timetracker/entity/AnagraficaDipendente
 	@Field 
-	private ContactDto eventCreator;
+	private EventContactDto eventCreator;
 	
 }

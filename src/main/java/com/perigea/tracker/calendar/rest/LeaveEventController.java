@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.perigea.tracker.calendar.dto.ContactDto;
-import com.perigea.tracker.calendar.dto.LeaveEventDto;
 import com.perigea.tracker.calendar.entity.LeaveEvent;
-import com.perigea.tracker.calendar.enums.CalendarEventType;
 import com.perigea.tracker.calendar.mapper.LeaveMapper;
 import com.perigea.tracker.calendar.service.LeaveEventService;
+import com.perigea.tracker.commons.dto.EventContactDto;
+import com.perigea.tracker.commons.dto.LeaveEventDto;
+import com.perigea.tracker.commons.enums.CalendarEventType;
 
 @RestController
 public class LeaveEventController {
@@ -45,7 +45,7 @@ public class LeaveEventController {
 	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByCreator(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
-			@RequestParam ContactDto creator,
+			@RequestParam EventContactDto creator,
 			@RequestParam CalendarEventType type) {
 		List<LeaveEventDto> events = leaveService.findAllByDateCreatorType(from, to, creator, type);
 		return new ResponseEntity<>(
@@ -57,7 +57,7 @@ public class LeaveEventController {
 	}
 	
 	@GetMapping(path = "/leave", params = {"creator"})
-	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByCreator(@RequestParam ContactDto creator) {
+	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByCreator(@RequestParam EventContactDto creator) {
 		List<LeaveEventDto> events = leaveService.findAllByEventCreator(creator);
 		return new ResponseEntity<>(
 				Response.<List<LeaveEventDto>>builder()
@@ -71,7 +71,7 @@ public class LeaveEventController {
 	public ResponseEntity<Response<List<LeaveEventDto>>> getAllInDateRangeByCreatorList(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
-			@RequestParam List<ContactDto> creators,
+			@RequestParam List<EventContactDto> creators,
 			@RequestParam CalendarEventType type) {
 		
 		List<LeaveEventDto> events = leaveService.findAllByDateCreatorListType(from, to, creators, type);

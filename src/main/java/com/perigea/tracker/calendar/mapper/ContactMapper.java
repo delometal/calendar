@@ -1,19 +1,18 @@
 package com.perigea.tracker.calendar.mapper;
 
 import java.util.List;
-
 import org.mapstruct.Mapper;
-
-import com.perigea.tracker.calendar.dto.ContactDto;
 import com.perigea.tracker.calendar.entity.Contact;
+import com.perigea.tracker.commons.dto.EventContactDto;
+
 @Mapper(componentModel = "spring")
 public interface ContactMapper {
 	
-	ContactDto mapToDto(Contact source);
+	EventContactDto mapToDto(Contact source);
 	
-	Contact mapToEntity(ContactDto source);
+	Contact mapToEntity(EventContactDto source);
 	
-	List<ContactDto> mapToDtoList(List<Contact> source);
+	List<EventContactDto> mapToDtoList(List<Contact> source);
 	
-	List<Contact> mapToEntityList(List<ContactDto> source);
+	List<Contact> mapToEntityList(List<EventContactDto> source);
 }

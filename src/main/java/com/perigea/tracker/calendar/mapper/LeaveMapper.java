@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
-import com.perigea.tracker.calendar.dto.LeaveEventDto;
 import com.perigea.tracker.calendar.entity.LeaveEvent;
+import com.perigea.tracker.commons.dto.LeaveEventDto;
 
 @Mapper(componentModel = "spring")
 public interface LeaveMapper {

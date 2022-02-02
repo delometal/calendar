@@ -9,15 +9,15 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.perigea.tracker.calendar.dto.ContactDto;
-import com.perigea.tracker.calendar.dto.LeaveEventDto;
 import com.perigea.tracker.calendar.entity.LeaveEvent;
-import com.perigea.tracker.calendar.enums.ApprovalStatus;
-import com.perigea.tracker.calendar.enums.CalendarEventType;
-import com.perigea.tracker.calendar.exception.EntityNotFoundException;
-import com.perigea.tracker.calendar.exception.LeaveEventException;
+import com.perigea.tracker.commons.dto.EventContactDto;
+import com.perigea.tracker.commons.dto.LeaveEventDto;
+import com.perigea.tracker.commons.enums.ApprovalStatus;
+import com.perigea.tracker.commons.enums.CalendarEventType;
+import com.perigea.tracker.commons.exception.EntityNotFoundException;
 import com.perigea.tracker.calendar.mapper.LeaveMapper;
 import com.perigea.tracker.calendar.repository.LeaveEventRepository;
+import com.perigea.tracker.commons.exception.LeaveEventException;
 
 @Service
 public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
@@ -51,7 +51,7 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 		}
 	}
 
-	public List<LeaveEventDto> findAllByEventCreator(ContactDto creator) {
+	public List<LeaveEventDto> findAllByEventCreator(EventContactDto creator) {
 		try {
 			return mapper.mapToDtoList(repository.findAllByEventCreator(creator));
 		} catch (Exception ex) {
@@ -70,7 +70,7 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 		}
 	}
 	
-	public List<LeaveEventDto> findAllByDateCreatorType(Date from, Date to, ContactDto creator, CalendarEventType type) {
+	public List<LeaveEventDto> findAllByDateCreatorType(Date from, Date to, EventContactDto creator, CalendarEventType type) {
 		try {
 			return mapper.mapToDtoList(
 					repository.findAllByStartDateBetweenByCreatorByType(from, to, creator, type));
@@ -82,7 +82,7 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 		}
 	}
 	
-	public List<LeaveEventDto> findAllByDateCreatorListType(Date from, Date to, List<ContactDto> creators, CalendarEventType type) {
+	public List<LeaveEventDto> findAllByDateCreatorListType(Date from, Date to, List<EventContactDto> creators, CalendarEventType type) {
 		try {
 			return mapper.mapToDtoList(
 					repository.findAllByStartDateBetweenByCreatorListByType(from, to, creators, type));

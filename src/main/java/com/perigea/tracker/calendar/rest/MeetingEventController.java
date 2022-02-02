@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.perigea.tracker.calendar.dto.ContactDto;
-import com.perigea.tracker.calendar.dto.MeetingEventDto;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.service.MeetingEventService;
 import com.perigea.tracker.calendar.service.MeetingRoomService;
+import com.perigea.tracker.commons.dto.EventContactDto;
+import com.perigea.tracker.commons.dto.MeetingEventDto;
 
 
 @RestController
@@ -58,7 +58,7 @@ public class MeetingEventController {
 	
 //	TODO String meetingCreator dovrà diventare un DTO del tipo Utente (?)
 	@GetMapping(path = "/meeting", params = {"creator"})
-	public ResponseEntity<Response<List<MeetingEventDto>>> getAllByCreator(@RequestParam ContactDto creator){
+	public ResponseEntity<Response<List<MeetingEventDto>>> getAllByCreator(@RequestParam EventContactDto creator){
 		//finestra di tempo simmetrica di due mesi
 		Calendar cal = new GregorianCalendar();
 		cal.add(Calendar.MONTH, -1);
@@ -87,7 +87,7 @@ public class MeetingEventController {
 	public ResponseEntity<Response<List<MeetingEventDto>>> getAllInDateRangeByCreator(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
-			@RequestParam ContactDto creator) {
+			@RequestParam EventContactDto creator) {
 		
 		List<MeetingEventDto> events = meetingService.getEventsBetweenByCreator(from, to, creator);
 		return new ResponseEntity<Response<List<MeetingEventDto>>>(
@@ -102,7 +102,7 @@ public class MeetingEventController {
 	public ResponseEntity<Response<List<MeetingEventDto>>> getAllInDateRangeByCreatorList(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
-			@RequestParam List<ContactDto> creators) {
+			@RequestParam List<EventContactDto> creators) {
 		
 		List<MeetingEventDto> events = meetingService.getEventsBetweenByCreatorList(from, to, creators);
 		return new ResponseEntity<Response<List<MeetingEventDto>>>(

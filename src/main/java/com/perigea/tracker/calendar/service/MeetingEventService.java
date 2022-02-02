@@ -9,15 +9,15 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.perigea.tracker.calendar.dto.ContactDto;
-import com.perigea.tracker.calendar.dto.MeetingEventDto;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
-import com.perigea.tracker.calendar.enums.CalendarEventType;
-import com.perigea.tracker.calendar.enums.ParticipationStatus;
-import com.perigea.tracker.calendar.exception.EntityNotFoundException;
-import com.perigea.tracker.calendar.exception.MeetingEventException;
+import com.perigea.tracker.commons.dto.EventContactDto;
+import com.perigea.tracker.commons.dto.MeetingEventDto;
+import com.perigea.tracker.commons.enums.CalendarEventType;
+import com.perigea.tracker.commons.enums.ParticipationStatus;
+import com.perigea.tracker.commons.exception.EntityNotFoundException;
 import com.perigea.tracker.calendar.mapper.MeetingMapper;
 import com.perigea.tracker.calendar.repository.MeetingEventRepository;
+import com.perigea.tracker.commons.exception.MeetingEventException;
 
 @Service
 public class MeetingEventService {
@@ -70,7 +70,7 @@ public class MeetingEventService {
 		}
 	}
 	
-	public List<MeetingEventDto> getEventsBetweenByCreator(Date from, Date to, ContactDto creator) {
+	public List<MeetingEventDto> getEventsBetweenByCreator(Date from, Date to, EventContactDto creator) {
 		try {
 			return mapper.mapToDtoList(repository.findAllByStartDateBetweenByCreator(from, to, creator));
 		}catch (Exception ex) {
@@ -82,7 +82,7 @@ public class MeetingEventService {
 	}
 	
 
-	public List<MeetingEventDto> getEventsBetweenByCreatorList(Date from, Date to, List<ContactDto> creators) {
+	public List<MeetingEventDto> getEventsBetweenByCreatorList(Date from, Date to, List<EventContactDto> creators) {
 		try {
 			return mapper.mapToDtoList(repository.findAllByStartDateBetweenByCreatorList(from, to, creators));
 		}catch (Exception ex) {
@@ -118,16 +118,16 @@ public class MeetingEventService {
 		if (event == null) {
 			throw new EntityNotFoundException("Meeting non trovato");
 		}
-		List<ContactDto> participants = event.getParticipants();
+		List<EventContactDto> participants = event.getParticipants();
 		
-		Optional<ContactDto> optionalParticipant = participants.stream()
+		Optional<EventContactDto> optionalParticipant = participants.stream()
 				.filter(p -> p.getCodicePersona().equals(participantId)).findFirst();
 
 		if (optionalParticipant.isEmpty()) {
 			throw new EntityNotFoundException("Partecipante non trovato");
 		}
 	
-		ContactDto participant = optionalParticipant.get();
+		EventContactDto participant = optionalParticipant.get();
 		participant.setParticipationStatus(status);
 		participants.removeIf(p -> p.getCodicePersona().equals(participantId));
 		participants.add(participant);

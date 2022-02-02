@@ -3,9 +3,9 @@ package com.perigea.tracker.calendar.entity;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import com.perigea.tracker.calendar.dto.ContactDto;
-import com.perigea.tracker.calendar.enums.ApprovalStatus;
-import com.perigea.tracker.calendar.enums.CalendarEventType;
+import com.perigea.tracker.commons.dto.EventContactDto;
+import com.perigea.tracker.commons.enums.ApprovalStatus;
+import com.perigea.tracker.commons.enums.CalendarEventType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class LeaveEvent extends CalendarEvent {
 	
 	@Field
-	private ContactDto superior;
+	private EventContactDto superior;
 	
 	@Field
 	private ApprovalStatus approved;

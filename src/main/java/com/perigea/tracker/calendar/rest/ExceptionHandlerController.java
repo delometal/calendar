@@ -5,10 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.perigea.tracker.calendar.exception.EntityNotFoundException;
-import com.perigea.tracker.calendar.exception.LeaveEventException;
-import com.perigea.tracker.calendar.exception.MeetingEventException;
-import com.perigea.tracker.calendar.exception.ParticipantException;
+import com.perigea.tracker.commons.exception.EntityNotFoundException;
+import com.perigea.tracker.commons.exception.LeaveEventException;
+import com.perigea.tracker.commons.exception.MeetingEventException;
+import com.perigea.tracker.commons.exception.ParticipantException;
 
 @ControllerAdvice
 public class ExceptionHandlerController {

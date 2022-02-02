@@ -1,7 +1,7 @@
 package com.perigea.tracker.calendar.entity;
 
-import com.perigea.tracker.calendar.enums.EmployeeType;
-import com.perigea.tracker.calendar.enums.ParticipationStatus;
+import com.perigea.tracker.commons.enums.EmployeeType;
+import com.perigea.tracker.commons.enums.ParticipationStatus;
 
 import lombok.Data;
 
