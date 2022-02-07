@@ -32,7 +32,7 @@ public class SchedulerService {
 	@Autowired
 	private ScheduledEventRepositoryService repositoryService;
 
-	public ScheduledEvent scheduleEstrazione(Date dataEsecuzione) {	
+	public ScheduledEvent scheduleNotifica(Date dataEsecuzione) {	
 		JobDetail detail = buildJobDetail();
 		Trigger trigger = buildJobTrigger(detail, dataEsecuzione);
 		try {
@@ -50,7 +50,7 @@ public class SchedulerService {
 		return info;
 	}
 	
-	public ScheduledEvent scheduleEstrazioneCron(String cron) {
+	public ScheduledEvent scheduleNotificaPeriodica(String cron) {
 		JobDetail detail = buildJobDetail();
 		Trigger trigger = buildCronJobTrigger(detail, cron);
 		
@@ -70,7 +70,7 @@ public class SchedulerService {
 		return info;
 	}
 
-	public boolean deleteEstrazione(String id) throws SchedulerException {
+	public boolean deleteNotifica(String id) throws SchedulerException {
 		JobKey key = new JobKey(id, "calendar");
 		repositoryService.deleteJobById(id);
 		return scheduler.deleteJob(key);
@@ -158,7 +158,7 @@ public class SchedulerService {
 	
     private JobDetail buildJobDetail() {
 		return JobBuilder.newJob(NotificationJob.class)
-                .withIdentity(UUID.randomUUID().toString(), "calendar")
+				.withIdentity(UUID.randomUUID().toString(), "calendar")
                 .withDescription("Job scheduler for notification")
                 .build();
     }

@@ -2,6 +2,7 @@ package com.perigea.tracker.calendar.entity;
 
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,6 +24,10 @@ public abstract class CalendarEvent {
 	@Field
 	private CalendarEventType type;
 	
+	// Conoscenza CC email
+	@Field
+	private List<EventContactDto> conoscenzaCC;
+	
 	@Field
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
 	private Date startDate;
@@ -31,7 +36,6 @@ public abstract class CalendarEvent {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
 	private Date endDate;
 	
-	// cfr codicePersona timetracker/entity/AnagraficaDipendente
 	@Field 
 	private EventContactDto eventCreator;
 	
