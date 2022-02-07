@@ -25,7 +25,7 @@ public class LeaveEvent extends CalendarEvent {
 	
 	public LeaveEvent (CalendarEventType type) {
 		this.setType(type);
-		this.setApproved(ApprovalStatus.Pending);
+		this.setApproved(ApprovalStatus.PENDING);
 	}
 
 }
