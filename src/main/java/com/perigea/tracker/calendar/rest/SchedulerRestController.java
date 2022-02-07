@@ -28,20 +28,20 @@ public class SchedulerRestController {
 	public ResponseEntity<ScheduledEvent> schedule(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date data) {
 		
-		return new ResponseEntity<>(service.scheduleEstrazione(data), HttpStatus.OK);
+		return new ResponseEntity<>(service.scheduleNotifica(data), HttpStatus.OK);
 	}
 	
 	@GetMapping(path = "schedule_periodico")
 	public ResponseEntity<ScheduledEvent> schedulePeriodico(@RequestParam String cron) {
 		
 		// FIXME NextFireTime = null
-		return new ResponseEntity<>(service.scheduleEstrazioneCron(cron), HttpStatus.OK);
+		return new ResponseEntity<>(service.scheduleNotificaPeriodica(cron), HttpStatus.OK);
 	}
 	
 	@GetMapping(path = "delete")
 	public ResponseEntity<String> delete(@RequestParam String id) throws SchedulerException{
 		
-		return new ResponseEntity<>(service.deleteEstrazione(id) ? "Deleted" : "Not found", HttpStatus.OK);
+		return new ResponseEntity<>(service.deleteNotifica(id) ? "Deleted" : "Not found", HttpStatus.OK);
 	}
 	
 	@GetMapping(path = "reschedule", params = {"id", "data"})
