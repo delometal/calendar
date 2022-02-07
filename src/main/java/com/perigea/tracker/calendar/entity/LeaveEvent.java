@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class LeaveEvent extends CalendarEvent {
 	
 	@Field
-	private EventContactDto superior;
+	private EventContactDto responsabile;
 	
 	@Field
 	private ApprovalStatus approved;
