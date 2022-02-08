@@ -10,13 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.perigea.tracker.calendar.entity.LeaveEvent;
-import com.perigea.tracker.commons.dto.EventContactDto;
-import com.perigea.tracker.commons.dto.LeaveEventDto;
+import com.perigea.tracker.calendar.repository.LeaveEventRepository;
 import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 import com.perigea.tracker.commons.exception.EntityNotFoundException;
-import com.perigea.tracker.calendar.mapper.LeaveMapper;
-import com.perigea.tracker.calendar.repository.LeaveEventRepository;
 import com.perigea.tracker.commons.exception.LeaveEventException;
 
 @Service
@@ -24,17 +21,14 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 
 	@Autowired
 	private LeaveEventRepository repository;
-	
+
 	@Autowired
 	private Logger logger;
-	
-	@Autowired
-	private LeaveMapper mapper;
 
-	public LeaveEventDto save(LeaveEvent event) {
-		LeaveEventDto savedEvent = mapper.mapToDto(repository.save(event));
+	public void save(LeaveEvent event) {
+		repository.save(event);
 		logger.info(String.format("%s aggiunto in persistenza", event.getType()));
-		return savedEvent;
+
 	}
 
 	public void delete(LeaveEvent event) {
@@ -43,17 +37,17 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 
 	}
 
-	public List<LeaveEventDto> getEventsBetween(Date from, Date to) {
+	public List<LeaveEvent> getEventsBetween(Date from, Date to) {
 		try {
-			return mapper.mapToDtoList(repository.findAllByStartDateBetween(from, to));
+			return repository.findAllByStartDateBetween(from, to);
 		} catch (Exception ex) {
 			throw new LeaveEventException(ex.getMessage());
 		}
 	}
 
-	public List<LeaveEventDto> findAllByEventCreator(EventContactDto creator) {
+	public List<LeaveEvent> findAllByEventCreator(String mailAziendaleCreator) {
 		try {
-			return mapper.mapToDtoList(repository.findAllByEventCreator(creator));
+			return repository.findAllByEventCreator(mailAziendaleCreator);
 		} catch (Exception ex) {
 			if (ex instanceof NoSuchElementException) {
 				throw new EntityNotFoundException(ex.getMessage());
@@ -62,18 +56,9 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 		}
 	}
 
-	public List<LeaveEventDto> findAllByType(CalendarEventType type) {
+	public List<LeaveEvent> findAllByResponsabile(String mailAziendaleResponsabile) {
 		try {
-			return mapper.mapToDtoList(repository.findAllByType(type));
-		} catch (Exception ex) {
-			throw new LeaveEventException(ex.getMessage());
-		}
-	}
-	
-	public List<LeaveEventDto> findAllByDateCreatorType(Date from, Date to, EventContactDto creator, CalendarEventType type) {
-		try {
-			return mapper.mapToDtoList(
-					repository.findAllByStartDateBetweenByCreatorByType(from, to, creator, type));
+			return repository.findByResponsabile(mailAziendaleResponsabile);
 		} catch (Exception ex) {
 			if (ex instanceof NoSuchElementException) {
 				throw new EntityNotFoundException(ex.getMessage());
@@ -81,21 +66,44 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 			throw new LeaveEventException(ex.getMessage());
 		}
 	}
-	
-	public List<LeaveEventDto> findAllByDateCreatorListType(Date from, Date to, List<EventContactDto> creators, CalendarEventType type) {
+
+	public List<LeaveEvent> findAllByType(CalendarEventType type) {
 		try {
-			return mapper.mapToDtoList(
-					repository.findAllByStartDateBetweenByCreatorListByType(from, to, creators, type));
+			return repository.findAllByType(type);
 		} catch (Exception ex) {
 			throw new LeaveEventException(ex.getMessage());
 		}
 	}
 
-	public LeaveEventDto updateApprovalStatus(String ID, ApprovalStatus status) {
+	public List<LeaveEvent> findAllByDateCreatorType(Date from, Date to, String mailAziendaleCreator,
+			CalendarEventType type) {
 		try {
-			LeaveEventDto event = findById(ID);
+			return repository.findAllByStartDateBetweenByCreatorByType(from, to, mailAziendaleCreator, type);
+		} catch (Exception ex) {
+			if (ex instanceof NoSuchElementException) {
+				throw new EntityNotFoundException(ex.getMessage());
+			}
+			throw new LeaveEventException(ex.getMessage());
+		}
+	}
+
+	public List<LeaveEvent> findAllByDateResponsabileType(Date from, Date to, String mailAziendaleResponsabile,
+			CalendarEventType type) {
+		try {
+			return repository.findAllByStartDateBetweenByResponsabileByType(from, to, mailAziendaleResponsabile, type);
+		} catch (Exception ex) {
+			if (ex instanceof NoSuchElementException) {
+				throw new EntityNotFoundException(ex.getMessage());
+			}
+			throw new LeaveEventException(ex.getMessage());
+		}
+	}
+
+	public LeaveEvent updateApprovalStatus(String ID, ApprovalStatus status) {
+		try {
+			LeaveEvent event = findById(ID);
 			event.setApproved(status);
-			repository.save(mapper.mapToEntity(event));
+			repository.save(event);
 			logger.info(String.format("Evento %s aggiornato", event.getType()));
 			return event;
 		} catch (Exception ex) {
@@ -103,10 +111,10 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 		}
 	}
 
-	public LeaveEventDto findById(String leaveId) {
+	public LeaveEvent findById(String leaveId) {
 		try {
 			Optional<LeaveEvent> optionalEvent = repository.findById(leaveId);
-			return optionalEvent.isPresent() ? mapper.mapToDto(optionalEvent.get()) : null;
+			return optionalEvent.isPresent() ? optionalEvent.get() : null;
 		} catch (Exception ex) {
 			if (ex instanceof NoSuchElementException) {
 				throw new EntityNotFoundException(ex.getMessage());

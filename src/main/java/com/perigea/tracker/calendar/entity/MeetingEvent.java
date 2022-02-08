@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.perigea.tracker.commons.dto.EventContactDto;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 
 import lombok.Data;
@@ -16,7 +17,7 @@ import lombok.EqualsAndHashCode;
 public class MeetingEvent extends CalendarEvent {
 
 	@Field
-	private List<Contact> participants;
+	private List<EventContactDto> participants;
 	
 	@Field 
 	private boolean meetingRoom;
