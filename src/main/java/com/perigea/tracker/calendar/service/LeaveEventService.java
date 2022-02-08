@@ -10,13 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.perigea.tracker.calendar.entity.LeaveEvent;
-import com.perigea.tracker.commons.dto.EventContactDto;
+import com.perigea.tracker.calendar.mapper.LeaveMapper;
+import com.perigea.tracker.calendar.repository.LeaveEventRepository;
 import com.perigea.tracker.commons.dto.LeaveEventDto;
 import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 import com.perigea.tracker.commons.exception.EntityNotFoundException;
-import com.perigea.tracker.calendar.mapper.LeaveMapper;
-import com.perigea.tracker.calendar.repository.LeaveEventRepository;
 import com.perigea.tracker.commons.exception.LeaveEventException;
 
 @Service
@@ -24,10 +23,10 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 
 	@Autowired
 	private LeaveEventRepository repository;
-	
+
 	@Autowired
 	private Logger logger;
-	
+
 	@Autowired
 	private LeaveMapper mapper;
 
@@ -51,9 +50,20 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 		}
 	}
 
-	public List<LeaveEventDto> findAllByEventCreator(EventContactDto creator) {
+	public List<LeaveEventDto> findAllByEventCreator(String mailAziendaleCreator) {
 		try {
-			return mapper.mapToDtoList(repository.findAllByEventCreator(creator));
+			return mapper.mapToDtoList(repository.findAllByEventCreator(mailAziendaleCreator));
+		} catch (Exception ex) {
+			if (ex instanceof NoSuchElementException) {
+				throw new EntityNotFoundException(ex.getMessage());
+			}
+			throw new LeaveEventException(ex.getMessage());
+		}
+	}
+
+	public List<LeaveEventDto> findAllByResponsabile(String mailAziendaleResponsabile) {
+		try {
+			return mapper.mapToDtoList(repository.findByResponsabile(mailAziendaleResponsabile));
 		} catch (Exception ex) {
 			if (ex instanceof NoSuchElementException) {
 				throw new EntityNotFoundException(ex.getMessage());
@@ -69,11 +79,12 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 			throw new LeaveEventException(ex.getMessage());
 		}
 	}
-	
-	public List<LeaveEventDto> findAllByDateCreatorType(Date from, Date to, EventContactDto creator, CalendarEventType type) {
+
+	public List<LeaveEventDto> findAllByDateCreatorType(Date from, Date to, String mailAziendaleCreator,
+			CalendarEventType type) {
 		try {
 			return mapper.mapToDtoList(
-					repository.findAllByStartDateBetweenByCreatorByType(from, to, creator, type));
+					repository.findAllByStartDateBetweenByCreatorByType(from, to, mailAziendaleCreator, type));
 		} catch (Exception ex) {
 			if (ex instanceof NoSuchElementException) {
 				throw new EntityNotFoundException(ex.getMessage());
@@ -81,12 +92,16 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 			throw new LeaveEventException(ex.getMessage());
 		}
 	}
-	
-	public List<LeaveEventDto> findAllByDateCreatorListType(Date from, Date to, List<EventContactDto> creators, CalendarEventType type) {
+
+	public List<LeaveEventDto> findAllByDateResponsabileType(Date from, Date to, String mailAziendaleResponsabile,
+			CalendarEventType type) {
 		try {
 			return mapper.mapToDtoList(
-					repository.findAllByStartDateBetweenByCreatorListByType(from, to, creators, type));
+					repository.findAllByStartDateBetweenByResponsabileByType(from, to, mailAziendaleResponsabile, type));
 		} catch (Exception ex) {
+			if (ex instanceof NoSuchElementException) {
+				throw new EntityNotFoundException(ex.getMessage());
+			}
 			throw new LeaveEventException(ex.getMessage());
 		}
 	}

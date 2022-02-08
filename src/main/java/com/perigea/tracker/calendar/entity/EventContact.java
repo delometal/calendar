@@ -6,7 +6,7 @@ import com.perigea.tracker.commons.enums.ParticipationStatus;
 import lombok.Data;
 
 @Data
-public class Contact {
+public class EventContact {
 	private Long id;
 	private String nome;
 	private String cognome;

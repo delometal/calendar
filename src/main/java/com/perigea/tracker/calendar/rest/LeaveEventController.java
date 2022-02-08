@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.perigea.tracker.calendar.entity.LeaveEvent;
 import com.perigea.tracker.calendar.mapper.LeaveMapper;
 import com.perigea.tracker.calendar.service.LeaveEventService;
-import com.perigea.tracker.commons.dto.EventContactDto;
 import com.perigea.tracker.commons.dto.LeaveEventDto;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 
@@ -30,7 +29,7 @@ public class LeaveEventController {
 	@Autowired
 	private LeaveMapper leaveMapper;
 	
-	@PostMapping(path = "/leave")
+	@PostMapping(path = "/leave/addLeaveEvent")
 	public ResponseEntity<Response<LeaveEvent>> addLeaveEvent(@RequestBody LeaveEvent leaveEvent) {
 		leaveService.save(leaveEvent);	
 		return new ResponseEntity<>(
@@ -41,49 +40,60 @@ public class LeaveEventController {
 				.build(), HttpStatus.OK);
 	}
 	
-	@GetMapping(path = "/leave", params = {"creator", "from", "to", "type"})
-	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByCreator(
+	@GetMapping(path = "/leave/getByDateCreatorType", params = {"mailAziendaleCeator", "from", "to", "type"})
+	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByCreatorBetweenDates(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
-			@RequestParam EventContactDto creator,
+			@RequestParam String mailAziendaleCeator,
 			@RequestParam CalendarEventType type) {
-		List<LeaveEventDto> events = leaveService.findAllByDateCreatorType(from, to, creator, type);
+		List<LeaveEventDto> events = leaveService.findAllByDateCreatorType(from, to, mailAziendaleCeator, type);
 		return new ResponseEntity<>(
 				Response.<List<LeaveEventDto>>builder()
 				.body(events)
 				.code(HttpStatus.OK.value())
-				.description(String.format("Lista dei permessi %s di %s dal %s al %s", creator))
+				.description(String.format("Lista dei permessi %s di %s dal %s al %s", mailAziendaleCeator))
 				.build(), HttpStatus.OK);
 	}
 	
-	@GetMapping(path = "/leave", params = {"creator"})
-	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByCreator(@RequestParam EventContactDto creator) {
-		List<LeaveEventDto> events = leaveService.findAllByEventCreator(creator);
-		return new ResponseEntity<>(
-				Response.<List<LeaveEventDto>>builder()
-				.body(events)
-				.code(HttpStatus.OK.value())
-				.description(String.format("Lista dei permessi di %s", creator))
-				.build(), HttpStatus.OK);
-	}
-	
-	@GetMapping(path = "/meeting", params = {"from", "to", "creators", "type"})
-	public ResponseEntity<Response<List<LeaveEventDto>>> getAllInDateRangeByCreatorList(
+	@GetMapping(path = "/leave/getByDateCreatorType", params = {"mailAziendaleResopnsabile", "from", "to", "type"})
+	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByResponsabileBewtweenDates(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
-			@RequestParam List<EventContactDto> creators,
+			@RequestParam String mailAziendaleResponsabile,
 			@RequestParam CalendarEventType type) {
-		
-		List<LeaveEventDto> events = leaveService.findAllByDateCreatorListType(from, to, creators, type);
+		List<LeaveEventDto> events = leaveService.findAllByDateResponsabileType(from, to, mailAziendaleResponsabile, type);
 		return new ResponseEntity<>(
 				Response.<List<LeaveEventDto>>builder()
 				.body(events)
-				.description(String.format("Lista dei permessi %s di %s tra il %s e il %s", type, creators, from, to))
 				.code(HttpStatus.OK.value())
+				.description(String.format("Lista dei permessi %s di %s dal %s al %s", mailAziendaleResponsabile))
 				.build(), HttpStatus.OK);
 	}
 	
-	@DeleteMapping(path = "/leave")
+	
+	@GetMapping(path = "/leave/getByEventCreator", params = {"mailAziendaleCreator"})
+	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByCreator(@RequestParam String mailAziendaleCreator) {
+		List<LeaveEventDto> events = leaveService.findAllByEventCreator(mailAziendaleCreator);
+		return new ResponseEntity<>(
+				Response.<List<LeaveEventDto>>builder()
+				.body(events)
+				.code(HttpStatus.OK.value())
+				.description(String.format("Lista dei permessi di %s", mailAziendaleCreator))
+				.build(), HttpStatus.OK);
+	}
+	
+	@GetMapping(path = "/leave/getByResponsabile", params = {"mailAziendaleResponsabile"})
+	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByResponsabile(@RequestParam String mailAziendaleResponsabile) {
+		List<LeaveEventDto> events = leaveService.findAllByResponsabile(mailAziendaleResponsabile);
+		return new ResponseEntity<>(
+				Response.<List<LeaveEventDto>>builder()
+				.body(events)
+				.code(HttpStatus.OK.value())
+				.description(String.format("Lista dei permessi di %s", mailAziendaleResponsabile))
+				.build(), HttpStatus.OK);
+	}
+	
+	@DeleteMapping(path = "/leave/deleteLeaveEvent")
 	public ResponseEntity<Response<LeaveEventDto>> deleteLeaveEvent(@RequestBody LeaveEventDto leaveEvent) {
 		leaveService.delete(leaveMapper.mapToEntity(leaveEvent));	
 		return new ResponseEntity<>(

@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 public class MeetingEvent extends CalendarEvent {
 
 	@Field
-	private List<Contact> participants;
+	private List<EventContact> participants;
 	
 	@Field 
 	private boolean meetingRoom;
