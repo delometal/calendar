@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.mapper.MeetingMapper;
+import com.perigea.tracker.calendar.service.EmailBuilderService;
 import com.perigea.tracker.calendar.service.MeetingEventService;
 import com.perigea.tracker.calendar.service.MeetingRoomService;
 import com.perigea.tracker.commons.dto.MeetingEventDto;
+import com.perigea.tracker.commons.model.Email;
 
 @RestController
 public class MeetingEventController {
@@ -28,6 +30,12 @@ public class MeetingEventController {
 	@Autowired
 	private MeetingEventService meetingService;
 
+	@Autowired
+	private EmailBuilderService emailBuilder;
+	
+	@Autowired
+	private NotificationRestClient notificator;
+	
 	@Autowired
 	private MeetingRoomService roomService;
 	
@@ -37,9 +45,11 @@ public class MeetingEventController {
 	// TODO mandare notifica ai partecipanti
 	@PostMapping(path = "/meeting/create-meeting")
 	public ResponseEntity<Response<MeetingEventDto>> addMeeting(@RequestBody MeetingEventDto meetingEvent) {
-		// TODO check jackson error
+
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		meetingService.save(event);
+		Email email = emailBuilder.buildFromMeetingEvent(event, "creato");
+		notificator.mandaNotifica(email);
 		return new ResponseEntity<>(Response.<MeetingEventDto>builder().body(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}
@@ -48,6 +58,8 @@ public class MeetingEventController {
 	public ResponseEntity<Response<MeetingEventDto>> deleteMeeting(@RequestBody MeetingEventDto toBeDeleted) {
 		MeetingEvent event = mapper.mapToEntity(toBeDeleted);
 		meetingService.delete(event);
+		Email email = emailBuilder.buildFromMeetingEvent(event, "eliminato");
+		notificator.mandaNotifica(email);
 		return new ResponseEntity<>(
 				Response.<MeetingEventDto>builder().body(toBeDeleted).code(HttpStatus.OK.value())
 						.description(String.format("Evento ID: %s eliminato", toBeDeleted.getID())).build(),

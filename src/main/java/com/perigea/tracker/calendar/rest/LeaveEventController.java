@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.perigea.tracker.calendar.entity.LeaveEvent;
 import com.perigea.tracker.calendar.mapper.LeaveMapper;
+import com.perigea.tracker.calendar.service.EmailBuilderService;
 import com.perigea.tracker.calendar.service.LeaveEventService;
 import com.perigea.tracker.commons.dto.LeaveEventDto;
 import com.perigea.tracker.commons.enums.CalendarEventType;
+import com.perigea.tracker.commons.model.Email;
 
 @RestController
 public class LeaveEventController {
@@ -29,9 +31,17 @@ public class LeaveEventController {
 	@Autowired
 	private LeaveMapper leaveMapper;
 
+	@Autowired
+	private EmailBuilderService emailBuilder;
+	
+	@Autowired
+	private NotificationRestClient notificator;
+	
 	@PostMapping(path = "/leave/add-Leave-Event")
 	public ResponseEntity<Response<LeaveEventDto>> addLeaveEvent(@RequestBody LeaveEventDto leaveEvent) {
 		LeaveEvent event = leaveMapper.mapToEntity(leaveEvent);
+		Email email = emailBuilder.buildFromLeaveEvent(event);
+		notificator.mandaNotifica(email);
 		leaveService.save(event);
 		return new ResponseEntity<>(
 				Response.<LeaveEventDto>builder().body(leaveEvent).code(HttpStatus.OK.value())
