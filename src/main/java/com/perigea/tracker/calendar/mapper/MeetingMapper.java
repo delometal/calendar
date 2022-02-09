@@ -10,9 +10,7 @@ import com.perigea.tracker.commons.dto.MeetingEventDto;
 
 @Mapper(componentModel = "spring", uses = ContactMapper.class)
 public interface MeetingMapper {
-	
-	MeetingMapper INSTANCE = Mappers.getMapper(MeetingMapper.class);
-	
+		
 	MeetingEventDto mapToDto(MeetingEvent source);
 	
 	MeetingEvent mapToEntity(MeetingEventDto source);
