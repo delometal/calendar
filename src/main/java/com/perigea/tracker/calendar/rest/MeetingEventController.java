@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,7 +43,6 @@ public class MeetingEventController {
 	@Autowired
 	private MeetingMapper mapper;
 
-	// TODO mandare notifica ai partecipanti
 	@PostMapping(path = "/meeting/create-meeting")
 	public ResponseEntity<Response<MeetingEventDto>> addMeeting(@RequestBody MeetingEventDto meetingEvent) {
 
@@ -52,6 +52,16 @@ public class MeetingEventController {
 		notificator.mandaNotifica(email);
 		return new ResponseEntity<>(Response.<MeetingEventDto>builder().body(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting inserito nel calendario").build(), HttpStatus.OK);
+	}
+	
+	@PutMapping(path = "/meeting/update-meeting")
+	public ResponseEntity<Response<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent){
+		MeetingEvent event = mapper.mapToEntity(meetingEvent);
+		meetingService.update(event);
+		Email email = emailBuilder.buildFromMeetingEvent(event, "modificato");
+		notificator.mandaNotifica(email);
+		return new ResponseEntity<>(Response.<MeetingEventDto>builder().body(meetingEvent).code(HttpStatus.OK.value())
+				.description("Meeting aggiornato nel calendario").build(), HttpStatus.OK);
 	}
 
 	@DeleteMapping(path = "/meeting/delete-meeting")
@@ -66,8 +76,8 @@ public class MeetingEventController {
 				HttpStatus.OK);
 	}
 
-//	TODO String meetingCreator dovrà diventare un DTO del tipo Utente (?)
-	@GetMapping(path = "/meeting/get-By-Creator", params = { "creator" })
+	
+	@GetMapping(path = "/meeting/get-by-creator", params = { "creator" })
 	public ResponseEntity<Response<List<MeetingEventDto>>> getAllByCreator(@RequestParam String mailAziendaleCreator) {
 		// finestra di tempo simmetrica di due mesi
 		Calendar cal = new GregorianCalendar();
@@ -79,7 +89,7 @@ public class MeetingEventController {
 		return getAllInDateRangeByCreator(from, to, mailAziendaleCreator);
 	}
 
-	@GetMapping(path = "/meeting/get-Meetings-In-Date-Range", params = { "from", "to" })
+	@GetMapping(path = "/meeting/get-meetings-in-date-range", params = { "from", "to" })
 	public ResponseEntity<Response<List<MeetingEventDto>>> getAllInDateRange(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to) {

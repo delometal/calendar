@@ -1,7 +1,6 @@
 package com.perigea.tracker.calendar.factory;
 
 import com.perigea.tracker.calendar.entity.MeetingEvent;
-import com.perigea.tracker.commons.dto.MeetingEventDto;
 
 import biweekly.Biweekly;
 import biweekly.ICalendar;

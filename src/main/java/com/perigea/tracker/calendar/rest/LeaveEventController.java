@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +25,7 @@ import com.perigea.tracker.commons.enums.CalendarEventType;
 import com.perigea.tracker.commons.model.Email;
 
 @RestController
+@RequestMapping(path = "/leave")
 public class LeaveEventController {
 
 	@Autowired
@@ -37,19 +40,41 @@ public class LeaveEventController {
 	@Autowired
 	private NotificationRestClient notificator;
 	
-	@PostMapping(path = "/leave/add-Leave-Event")
+	@PostMapping(path = "/add-Leave-Event")
 	public ResponseEntity<Response<LeaveEventDto>> addLeaveEvent(@RequestBody LeaveEventDto leaveEvent) {
 		LeaveEvent event = leaveMapper.mapToEntity(leaveEvent);
-		Email email = emailBuilder.buildFromLeaveEvent(event);
+		Email email = emailBuilder.buildFromLeaveEvent(event, "creato");
 		notificator.mandaNotifica(email);
 		leaveService.save(event);
 		return new ResponseEntity<>(
 				Response.<LeaveEventDto>builder().body(leaveEvent).code(HttpStatus.OK.value())
-						.description(String.format("Meeting %s inserito nel calendario", leaveEvent.getID())).build(),
+						.description(String.format("%s %s salvato", leaveEvent.getType(),leaveEvent.getID())).build(),
 				HttpStatus.OK);
 	}
+	
+	@DeleteMapping(path = "/delete-Event")
+	public ResponseEntity<Response<LeaveEventDto>> deleteLeaveEvent(@RequestBody LeaveEventDto leaveEvent) {
+		LeaveEvent toBeDeleted = leaveMapper.mapToEntity(leaveEvent);
+		leaveService.delete(toBeDeleted);
+		Email email = emailBuilder.buildFromLeaveEvent(toBeDeleted, "eliminato");
+		notificator.mandaNotifica(email);
+		return new ResponseEntity<>(Response.<LeaveEventDto>builder().body(leaveEvent).code(HttpStatus.OK.value())
+				.description(String.format("%s eliminato", leaveEvent.getType())).build(), HttpStatus.OK);
+	}
 
-	@GetMapping(path = "/leave/get-By-Date-Creator-Type", params = { "mailAziendaleCeator", "from", "to", "type" })
+	@PutMapping(path = "/update-event")
+	public ResponseEntity<Response<LeaveEventDto>> updateLeaveEvent(@RequestBody LeaveEventDto leaveEvent) {
+		LeaveEvent toBeUpdated = leaveMapper.mapToEntity(leaveEvent);
+		leaveService.update(toBeUpdated);
+		Email email = emailBuilder.buildFromLeaveEvent(toBeUpdated, "modificato");
+		notificator.mandaNotifica(email);
+		return new ResponseEntity<>(Response.<LeaveEventDto>builder().body(leaveEvent).code(HttpStatus.OK.value())
+				.description(String.format("%s %s aggiornato", leaveEvent.getType(),leaveEvent.getID())).build(), 
+				HttpStatus.OK);
+		
+	}
+	
+	@GetMapping(path = "/get-By-Date-Creator-Type", params = { "mailAziendaleCeator", "from", "to", "type" })
 	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByCreatorBetweenDates(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
@@ -61,7 +86,7 @@ public class LeaveEventController {
 				HttpStatus.OK);
 	}
 
-	@GetMapping(path = "/leave/get-By-Date-Creator-Type", params = { "mailAziendaleResopnsabile", "from", "to",
+	@GetMapping(path = "/get-By-Date-responsabile-Type", params = { "mailAziendaleResopnsabile", "from", "to",
 			"type" })
 	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByResponsabileBewtweenDates(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
@@ -74,7 +99,7 @@ public class LeaveEventController {
 				.build(), HttpStatus.OK);
 	}
 
-	@GetMapping(path = "/leave/get-By-Event-Creator", params = { "mailAziendaleCreator" })
+	@GetMapping(path = "/get-By-Event-Creator", params = { "mailAziendaleCreator" })
 	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByCreator(@RequestParam String mailAziendaleCreator) {
 		List<LeaveEvent> events = leaveService.findAllByEventCreator(mailAziendaleCreator);
 		List<LeaveEventDto> leaves = leaveMapper.mapToDtoList(events);
@@ -84,7 +109,7 @@ public class LeaveEventController {
 				HttpStatus.OK);
 	}
 
-	@GetMapping(path = "/leave/get-By-Responsabile", params = { "mailAziendaleResponsabile" })
+	@GetMapping(path = "/get-By-Responsabile", params = { "mailAziendaleResponsabile" })
 	public ResponseEntity<Response<List<LeaveEventDto>>> findAllByResponsabile(
 			@RequestParam String mailAziendaleResponsabile) {
 		List<LeaveEvent> events = leaveService.findAllByResponsabile(mailAziendaleResponsabile);
@@ -95,10 +120,4 @@ public class LeaveEventController {
 				HttpStatus.OK);
 	}
 
-	@DeleteMapping(path = "/leave/delete-Leave-Event")
-	public ResponseEntity<Response<LeaveEventDto>> deleteLeaveEvent(@RequestBody LeaveEventDto leaveEvent) {
-		leaveService.delete(leaveMapper.mapToEntity(leaveEvent));
-		return new ResponseEntity<>(Response.<LeaveEventDto>builder().body(leaveEvent).code(HttpStatus.OK.value())
-				.description(String.format("%s eliminato", leaveEvent.getType())).build(), HttpStatus.OK);
-	}
 }
