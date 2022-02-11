@@ -26,7 +26,7 @@ public class SchedulerRestController {
 	// intervallo numero di giorni? ore? boh
 	@GetMapping(path = "schedule")
 	public ResponseEntity<ScheduledEvent> schedule(
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date data) {
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date data) {
 		
 		return new ResponseEntity<>(service.scheduleNotifica(data), HttpStatus.OK);
 	}

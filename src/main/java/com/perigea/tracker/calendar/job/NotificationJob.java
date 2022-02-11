@@ -16,7 +16,7 @@ public class NotificationJob implements Job {
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		notificationRestClient.mandaNotifica(null);
+		//notificationRestClient.mandaNotifica(null);
 	}
 
 }
