@@ -36,7 +36,16 @@ public class MeetingEventService {
 		repository.delete(event);
 		logger.info(String.format("Evento %s cancellato", event.getID()));
 	}
-
+	
+	public void update(MeetingEvent event) {
+		if (findById(event.getID()) == null){
+			throw new EntityNotFoundException(event.getID() + " not found");
+		}
+		
+		repository.save(event);
+	}
+	
+	
 	public List<MeetingEvent> getEventsBetween(Date from, Date to) {
 		try {
 			List<MeetingEvent> events = repository.findAllByStartDateBetween(from, to);

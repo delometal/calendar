@@ -1,7 +1,9 @@
 package com.perigea.tracker.calendar.mapper;
 
 import java.util.List;
+
 import org.mapstruct.Mapper;
+
 import com.perigea.tracker.calendar.entity.EventContact;
 import com.perigea.tracker.commons.dto.EventContactDto;
 

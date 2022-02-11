@@ -21,7 +21,7 @@ public class EmailBuilderService {
 	@Value("${spring.mail.username}")
 	private String sender;
 	
-	private static final String PATTERN = "yyyy-MM-dd HH:mm";
+	private static final String PATTERN = "dd-MM-yyyy HH:mm";
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(PATTERN);
 	
 	public Email buildFromMeetingEvent(MeetingEvent event, String azione) {
@@ -29,36 +29,48 @@ public class EmailBuilderService {
 		for (EventContactDto c : event.getParticipants()) {
 			recipients.add(c.getMailAziendale());
 		}	
+		
 		Map<String, Object> templateData = new HashMap<>();		
-		templateData.put("creator", event.getEventCreator().getMailAziendale());
+		templateData.put("creator", String.format("%s %s", 
+				event.getEventCreator().getNome(),
+				event.getEventCreator().getCognome()));
 		templateData.put("eventType", event.getType());
-		templateData.put("data", DATE_FORMAT.format(event.getStartDate()));
+		templateData.put("dataInizio", DATE_FORMAT.format(event.getStartDate()));
+		templateData.put("dataFine", DATE_FORMAT.format(event.getEndDate()));
 		templateData.put("partecipanti", recipients);
 		templateData.put("azione", azione);
+		templateData.put("presenza", event.isInPerson());
 		
 		return Email.builder()
 				.from(sender)
 				.templateName("meetingTemplate.ftlh")
 				.templateModel(templateData)
-				.subject(event.getDescription())
+				.subject(String.format("%s: %s", 
+						event.getType(), 
+						event.getDescription()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL)
 				.to(recipients)
 				.build();
 	}
 	
-	public Email buildFromLeaveEvent(LeaveEvent event) {
+	public Email buildFromLeaveEvent(LeaveEvent event, String azione) {
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getResponsabile().getMailAziendale());
 		Map<String, Object> templateData = new HashMap<>();
 		templateData.put("richiedente", event.getEventCreator().getMailAziendale());
 		templateData.put("eventType", event.getType());
-		templateData.put("data", DATE_FORMAT.format(event.getStartDate()));
+		templateData.put("azione", azione);
+		templateData.put("data-inizio", DATE_FORMAT.format(event.getStartDate()));
+		templateData.put("data-fine", DATE_FORMAT.format(event.getEndDate()));
 		
 		return Email.builder()
 				.from(sender)
 				.templateName("leaveTemplate.ftlh")
 				.templateModel(templateData)
-				.subject(String.format("%s richiesta da %s",event.getType().toString(), event.getEventCreator().getMailAziendale()))
+				.subject(String.format("%s %s: %s",
+						event.getEventCreator().getNome(), 
+						event.getEventCreator().getCognome(), 
+						event.getType()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL)
 				.to(recipient)
 				.build();		

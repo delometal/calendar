@@ -36,6 +36,14 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 		logger.info(String.format("%s rimosso", event.getType()));
 
 	}
+	
+	public void update(LeaveEvent event) {
+		if (repository.findById(event.getID()).isEmpty()) {
+			throw new EntityNotFoundException(event.getID() + " not found");
+		}
+		System.out.println(repository.findById(event.getID()));
+		repository.save(event);
+	}
 
 	public List<LeaveEvent> getEventsBetween(Date from, Date to) {
 		try {
