@@ -22,6 +22,7 @@ import com.perigea.tracker.calendar.mapper.MeetingMapper;
 import com.perigea.tracker.calendar.service.EmailBuilderService;
 import com.perigea.tracker.calendar.service.MeetingEventService;
 import com.perigea.tracker.calendar.service.MeetingRoomService;
+import com.perigea.tracker.calendar.service.SchedulerService;
 import com.perigea.tracker.commons.dto.MeetingEventDto;
 import com.perigea.tracker.commons.model.Email;
 
@@ -30,6 +31,9 @@ public class MeetingEventController {
 
 	@Autowired
 	private MeetingEventService meetingService;
+	
+	@Autowired
+	private SchedulerService schedulerService;
 
 	@Autowired
 	private EmailBuilderService emailBuilder;
@@ -49,30 +53,42 @@ public class MeetingEventController {
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		meetingService.save(event);
 		Email email = emailBuilder.buildFromMeetingEvent(event, "creato");
-		notificator.mandaNotifica(email);
+		//notificator.mandaNotifica(email);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(meetingEvent.getStartDate());
+		cal.add(Calendar.MINUTE, -15);
+		Date notificationDate = cal.getTime();
+		schedulerService.scheduleNotifica(notificationDate, email);
 		return new ResponseEntity<>(Response.<MeetingEventDto>builder().body(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}
 	
 	@PutMapping(path = "/meeting/update-meeting")
-	public ResponseEntity<Response<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent){
+	public ResponseEntity<Response<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent) {
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		meetingService.update(event);
 		Email email = emailBuilder.buildFromMeetingEvent(event, "modificato");
 		notificator.mandaNotifica(email);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(meetingEvent.getStartDate());
+		cal.add(Calendar.MINUTE, -15);
+		Date notificationDate = cal.getTime();
+		schedulerService.reschedule(notificationDate, email.getEventID(), email);
 		return new ResponseEntity<>(Response.<MeetingEventDto>builder().body(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting aggiornato nel calendario").build(), HttpStatus.OK);
 	}
 
 	@DeleteMapping(path = "/meeting/delete-meeting")
-	public ResponseEntity<Response<MeetingEventDto>> deleteMeeting(@RequestBody MeetingEventDto toBeDeleted) {
+	public ResponseEntity<Response<String>> deleteMeeting(@RequestBody MeetingEventDto toBeDeleted) {
 		MeetingEvent event = mapper.mapToEntity(toBeDeleted);
 		meetingService.delete(event);
 		Email email = emailBuilder.buildFromMeetingEvent(event, "eliminato");
 		notificator.mandaNotifica(email);
+		boolean deleted = schedulerService.deleteNotifica(toBeDeleted.getID());
 		return new ResponseEntity<>(
-				Response.<MeetingEventDto>builder().body(toBeDeleted).code(HttpStatus.OK.value())
-						.description(String.format("Evento ID: %s eliminato", toBeDeleted.getID())).build(),
+				Response.<String>builder().body(deleted ? "OK" : "Error")
+						.code(deleted ? HttpStatus.OK.value() : HttpStatus.BAD_REQUEST.value())
+						.build(),
 				HttpStatus.OK);
 	}
 

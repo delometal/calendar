@@ -23,33 +23,33 @@ public class SchedulerRestController {
 	@Autowired
 	private SchedulerService service;
 	
-	// intervallo numero di giorni? ore? boh
-	@GetMapping(path = "schedule")
-	public ResponseEntity<ScheduledEvent> schedule(
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date data) {
-		
-		return new ResponseEntity<>(service.scheduleNotifica(data), HttpStatus.OK);
-	}
-	
-	@GetMapping(path = "schedule_periodico")
-	public ResponseEntity<ScheduledEvent> schedulePeriodico(@RequestParam String cron) {
-		
-		// FIXME NextFireTime = null
-		return new ResponseEntity<>(service.scheduleNotificaPeriodica(cron), HttpStatus.OK);
-	}
-	
+//	// intervallo numero di giorni? ore? boh
+//	@GetMapping(path = "schedule")
+//	public ResponseEntity<ScheduledEvent> schedule(
+//			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date data) {
+//		
+//		return new ResponseEntity<>(service.scheduleNotifica(data), HttpStatus.OK);
+//	}
+//	
+//	@GetMapping(path = "schedule_periodico")
+//	public ResponseEntity<ScheduledEvent> schedulePeriodico(@RequestParam String cron) {
+//		
+//		// FIXME NextFireTime = null
+//		return new ResponseEntity<>(service.scheduleNotificaPeriodica(cron), HttpStatus.OK);
+//	}
+//	
 	@GetMapping(path = "delete")
 	public ResponseEntity<String> delete(@RequestParam String id) throws SchedulerException{
 		
 		return new ResponseEntity<>(service.deleteNotifica(id) ? "Deleted" : "Not found", HttpStatus.OK);
 	}
 	
-	@GetMapping(path = "reschedule", params = {"id", "data"})
-	public ResponseEntity<ScheduledEvent> reschedule(@RequestParam String id,
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date data) throws SchedulerException {
-		
-		return new ResponseEntity<>(service.reschedule(data, id), HttpStatus.OK);
-	}
+//	@GetMapping(path = "reschedule", params = {"id", "data"})
+//	public ResponseEntity<ScheduledEvent> reschedule(@RequestParam String id,
+//			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date data) throws SchedulerException {
+//		
+//		return new ResponseEntity<>(service.reschedule(data, id), HttpStatus.OK);
+//	}
 	
 	@GetMapping(path = "reschedule", params = {"id", "cron"})
 	public ResponseEntity<ScheduledEvent> reschedule(@RequestParam String id,

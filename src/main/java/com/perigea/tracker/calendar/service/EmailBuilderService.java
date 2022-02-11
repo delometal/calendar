@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,9 @@ public class EmailBuilderService {
 	private static final String PATTERN = "dd-MM-yyyy HH:mm";
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(PATTERN);
 	
+	
 	public Email buildFromMeetingEvent(MeetingEvent event, String azione) {
+		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipients = new ArrayList<>();
 		for (EventContactDto c : event.getParticipants()) {
 			recipients.add(c.getMailAziendale());
@@ -42,6 +45,7 @@ public class EmailBuilderService {
 		templateData.put("presenza", event.isInPerson());
 		
 		return Email.builder()
+				.eventID(event.getID())
 				.from(sender)
 				.templateName("meetingTemplate.ftlh")
 				.templateModel(templateData)
@@ -54,6 +58,7 @@ public class EmailBuilderService {
 	}
 	
 	public Email buildFromLeaveEvent(LeaveEvent event, String azione) {
+		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getResponsabile().getMailAziendale());
 		Map<String, Object> templateData = new HashMap<>();
@@ -64,6 +69,7 @@ public class EmailBuilderService {
 		templateData.put("data-fine", DATE_FORMAT.format(event.getEndDate()));
 		
 		return Email.builder()
+				.eventID(event.getID())
 				.from(sender)
 				.templateName("leaveTemplate.ftlh")
 				.templateModel(templateData)

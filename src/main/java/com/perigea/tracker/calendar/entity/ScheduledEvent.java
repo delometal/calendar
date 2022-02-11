@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.perigea.tracker.commons.enums.EventStatus;
+import com.perigea.tracker.commons.model.Email;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,9 @@ public class ScheduledEvent {
 	@Field
 	@Id
 	private String id;
+	
+	@Field
+	private Email email;
 	
 	@Field
 	private Date nextFireTime;

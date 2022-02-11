@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.perigea.tracker.commons.exception.EntityNotFoundException;
 import com.perigea.tracker.commons.exception.LeaveEventException;
 import com.perigea.tracker.commons.exception.MeetingEventException;
+import com.perigea.tracker.commons.exception.NotificationSchedulerException;
 import com.perigea.tracker.commons.exception.ParticipantException;
 
 @ControllerAdvice
@@ -57,5 +58,15 @@ public class ExceptionHandlerController {
 				.build(), HttpStatus.NOT_FOUND);
 	}
 	
+	@ExceptionHandler(NotificationSchedulerException.class)
+	public final ResponseEntity<Response<String>> handleSchedulerException(NotificationSchedulerException ex) {
+		return new ResponseEntity<>(
+				Response.<String>builder()
+				.body(null)
+				.type(Response.Type.ERROR)
+				.code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+				.description(ex.getMessage())
+				.build(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }
