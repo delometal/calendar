@@ -53,12 +53,12 @@ public class MeetingEventController {
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		meetingService.save(event);
 		Email email = emailBuilder.buildFromMeetingEvent(event, "creato");
-		//notificator.mandaNotifica(email);
+		notificator.mandaNotifica(email);
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(meetingEvent.getStartDate());
 		cal.add(Calendar.MINUTE, -15);
 		Date notificationDate = cal.getTime();
-		schedulerService.scheduleNotifica(notificationDate, email);
+		schedulerService.scheduleNotifica(notificationDate, emailBuilder.buildReminderEmail(event));
 		return new ResponseEntity<>(Response.<MeetingEventDto>builder().body(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}
@@ -73,7 +73,7 @@ public class MeetingEventController {
 		cal.setTime(meetingEvent.getStartDate());
 		cal.add(Calendar.MINUTE, -15);
 		Date notificationDate = cal.getTime();
-		schedulerService.reschedule(notificationDate, email.getEventID(), email);
+		schedulerService.reschedule(notificationDate, email.getEventID(), emailBuilder.buildReminderEmail(event));
 		return new ResponseEntity<>(Response.<MeetingEventDto>builder().body(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting aggiornato nel calendario").build(), HttpStatus.OK);
 	}
