@@ -71,7 +71,17 @@ public class LeaveEventController {
 		return new ResponseEntity<>(Response.<LeaveEventDto>builder().body(leaveEvent).code(HttpStatus.OK.value())
 				.description(String.format("%s %s aggiornato", leaveEvent.getType(),leaveEvent.getID())).build(), 
 				HttpStatus.OK);
-		
+	}
+	
+	@PutMapping(path = "/approve")
+	public ResponseEntity<Response<LeaveEventDto>> approveEvent(@RequestBody LeaveEventDto leaveEvent) {
+		LeaveEvent toBeApproved = leaveMapper.mapToEntity(leaveEvent);
+		leaveService.update(toBeApproved);
+		Email email = emailBuilder.buildApprovalEmail(toBeApproved);
+		notificator.mandaNotifica(email);
+		return new ResponseEntity<>(Response.<LeaveEventDto>builder().body(leaveEvent).code(HttpStatus.OK.value())
+				.description(String.format("Stato di approvazione: %s", leaveEvent.getApproved())).build(), 
+				HttpStatus.OK);
 	}
 	
 	@GetMapping(path = "/get-By-Date-Creator-Type", params = { "mailAziendaleCeator", "from", "to", "type" })

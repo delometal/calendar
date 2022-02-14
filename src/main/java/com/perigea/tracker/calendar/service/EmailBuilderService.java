@@ -90,11 +90,11 @@ public class EmailBuilderService {
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getResponsabile().getMailAziendale());
 		Map<String, Object> templateData = new HashMap<>();
-		templateData.put("richiedente", event.getEventCreator().getMailAziendale());
+		templateData.put("utente", event.getEventCreator().getMailAziendale());
 		templateData.put("eventType", event.getType());
 		templateData.put("azione", azione);
-		templateData.put("data-inizio", DATE_FORMAT.format(event.getStartDate()));
-		templateData.put("data-fine", DATE_FORMAT.format(event.getEndDate()));
+		templateData.put("dataInizio", DATE_FORMAT.format(event.getStartDate()));
+		templateData.put("dataFine", DATE_FORMAT.format(event.getEndDate()));
 		
 		return Email.builder()
 				.eventID(event.getID())
@@ -105,6 +105,32 @@ public class EmailBuilderService {
 						event.getEventCreator().getNome(), 
 						event.getEventCreator().getCognome(), 
 						event.getType()))
+				.emailType(EmailType.HTML_TEMPLATE_MAIL)
+				.to(recipient)
+				.build();		
+	}
+	
+	public Email buildApprovalEmail(LeaveEvent event) {
+		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("ECT"));
+		List<String> recipient = new ArrayList<>();
+		recipient.add(event.getEventCreator().getMailAziendale());
+		Map<String, Object> templateData = new HashMap<>();
+		templateData.put("utente", event.getResponsabile().getMailAziendale());
+		templateData.put("eventType", event.getType());
+		templateData.put("azione", event.getApproved().toString().toLowerCase());
+		templateData.put("dataInizio", DATE_FORMAT.format(event.getStartDate()));
+		templateData.put("dataFine", DATE_FORMAT.format(event.getEndDate()));
+		
+		return Email.builder()
+				.eventID(event.getID())
+				.from(sender)
+				.templateName("leaveTemplate.ftlh")
+				.templateModel(templateData)
+				.subject(String.format("%s %s: %s %s",
+						event.getResponsabile().getNome(), 
+						event.getResponsabile().getCognome(), 
+						event.getType(),
+						event.getApproved().toString().toLowerCase()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL)
 				.to(recipient)
 				.build();		
