@@ -57,6 +57,34 @@ public class EmailBuilderService {
 				.build();
 	}
 	
+	public Email buildReminderEmail(MeetingEvent event) {
+		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("ECT"));
+		List<String> recipients = new ArrayList<>();
+		for (EventContactDto c : event.getParticipants()) {
+			recipients.add(c.getMailAziendale());
+		}	
+
+		Map<String, Object> templateData = new HashMap<>();		
+		templateData.put("creator", String.format("%s %s", 
+				event.getEventCreator().getNome(),
+				event.getEventCreator().getCognome()));
+		templateData.put("eventType", event.getType());
+		templateData.put("dataInizio", DATE_FORMAT.format(event.getStartDate()));
+		templateData.put("partecipanti", recipients);
+		
+		return Email.builder()
+				.eventID(event.getID())
+				.from(sender)
+				.templateName("notificationTemplate.ftlh")
+				.templateModel(templateData)
+				.subject(String.format("REMINDER: %s inizierà a breve", 
+						event.getType()))
+				.emailType(EmailType.HTML_TEMPLATE_MAIL)
+				.to(recipients)
+				.build();
+		
+	}
+	
 	public Email buildFromLeaveEvent(LeaveEvent event, String azione) {
 		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
