@@ -1,11 +1,9 @@
 package com.perigea.tracker.calendar.rest;
 
-import java.util.Date;
 import java.util.List;
 
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,10 +36,16 @@ public class SchedulerRestController {
 //		return new ResponseEntity<>(service.scheduleNotificaPeriodica(cron), HttpStatus.OK);
 //	}
 //	
+	@GetMapping(path = "pause")
+	public ResponseEntity<String> pause(@RequestParam String id) throws SchedulerException{
+		
+		return new ResponseEntity<>(service.pauseNotification(id), HttpStatus.OK);
+	}
+	
 	@GetMapping(path = "delete")
 	public ResponseEntity<String> delete(@RequestParam String id) throws SchedulerException{
 		
-		return new ResponseEntity<>(service.deleteNotifica(id) ? "Deleted" : "Not found", HttpStatus.OK);
+		return new ResponseEntity<>(service.disactiveNotification(id) ? "Deleted" : "Not found", HttpStatus.OK);
 	}
 	
 //	@GetMapping(path = "reschedule", params = {"id", "data"})

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.perigea.tracker.calendar.entity.ScheduledEvent;
 import com.perigea.tracker.calendar.entity.ScheduledEvent.Tipo;
 import com.perigea.tracker.calendar.job.NotificationJob;
+import com.perigea.tracker.commons.enums.EventStatus;
 import com.perigea.tracker.commons.exception.NotificationSchedulerException;
 import com.perigea.tracker.commons.model.Email;
 
@@ -27,17 +28,17 @@ import com.perigea.tracker.commons.model.Email;
 
 @Service
 public class SchedulerService {
-	
+
 	@Autowired
 	private Scheduler scheduler;
-	
+
 	@Autowired
 	Logger logger;
-	
+
 	@Autowired
 	private ScheduledEventRepositoryService repositoryService;
 
-	public ScheduledEvent scheduleNotifica(Date dataEsecuzione, Email email) {	
+	public ScheduledEvent scheduleNotifica(Date dataEsecuzione, Email email) {
 		JobDetail detail = buildJobDetail(email);
 		Trigger trigger = buildJobTrigger(detail, dataEsecuzione);
 		try {
@@ -47,48 +48,72 @@ public class SchedulerService {
 			throw new NotificationSchedulerException(e.getMessage());
 		}
 
-		ScheduledEvent info = ScheduledEvent.builder()
-				.email(email)
-				.id(detail.getKey().getName())
-				.nextFireTime(dataEsecuzione)
-				.tipo(Tipo.ISTANTANEA.name())
-				.build();
+		ScheduledEvent info = ScheduledEvent.builder().email(email).id(detail.getKey().getName())
+				.nextFireTime(dataEsecuzione).tipo(Tipo.ISTANTANEA.name()).status(EventStatus.Active).build();
 		repositoryService.save(info);
 		return info;
 	}
-	
+
 	public ScheduledEvent scheduleNotificaPeriodica(String cron, Email email) {
 		JobDetail detail = buildJobDetail(email);
 		Trigger trigger = buildCronJobTrigger(detail, cron);
-		
 		try {
 			Date nextFire = scheduler.scheduleJob(detail, trigger);
 			logger.info(String.format("Notifica periodica in data: ", nextFire));
 		} catch (Exception e) {
 			throw new NotificationSchedulerException(e.getMessage());
 		}
-		
-		ScheduledEvent info = ScheduledEvent.builder()
-				.email(email)
-				.id(detail.getKey().getName())
-				.nextFireTime(trigger.getNextFireTime())
-				.cron(cron)
-				.tipo(Tipo.PERIODICO.name())
-				.build();
+
+		ScheduledEvent info = ScheduledEvent.builder().email(email).id(detail.getKey().getName())
+				.nextFireTime(trigger.getNextFireTime()).cron(cron).tipo(Tipo.PERIODICO.name())
+				.status(EventStatus.Active).build();
 		repositoryService.save(info);
 		return info;
 	}
 
-	public boolean deleteNotifica(String id) {
+	public String pauseNotification(String id) {
 		try {
 			JobKey key = new JobKey(id, "calendar");
-			repositoryService.deleteJobById(id);
+			ScheduledEvent event = repositoryService.getById(id);
+			scheduler.pauseJob(key);
+			event.setStatus(EventStatus.Paused);
+			repositoryService.save(event);
+			return "ScheduleEvent paused";
+		} catch (Exception e) {
+			throw new NotificationSchedulerException(e.getMessage());
+		}
+
+	}
+
+	public ScheduledEvent resumeNotification(String id) {
+		try {
+			ScheduledEvent event = repositoryService.getByStatusAndId(EventStatus.Paused, id);
+			JobKey jobKey = new JobKey(id, "calendar");
+			if (!scheduler.checkExists(jobKey)) {
+				return null;
+			}
+			scheduler.resumeJob(jobKey);
+			event.setStatus(EventStatus.Active);
+			repositoryService.save(event);
+			return event;
+		} catch (Exception e) {
+			throw new NotificationSchedulerException(e.getMessage());
+		}
+	}
+
+	public boolean disactiveNotification(String id) {
+		try {
+			JobKey key = new JobKey(id, "calendar");
+//			repositoryService.deleteJobById(id);
+			ScheduledEvent event = repositoryService.getById(id);
+			event.setStatus(EventStatus.Inactive);
+			repositoryService.save(event);
 			return scheduler.deleteJob(key);
 		} catch (Exception e) {
 			throw new NotificationSchedulerException(e.getMessage());
 		}
 	}
-	
+
 	public ScheduledEvent reschedule(Date nuovaData, String id, Email email) {
 		JobDetail detail = buildJobDetail(email);
 		JobKey jobKey = new JobKey(id, "calendar");
@@ -100,12 +125,8 @@ public class SchedulerService {
 			Trigger trigger = buildJobTrigger(detail, nuovaData, id);
 			scheduler.rescheduleJob(triggerKey, trigger);
 			logger.info(String.format("Notifica rischedulata in data %s", nuovaData));
-			ScheduledEvent info = ScheduledEvent.builder()
-					.email(email)
-					.id(detail.getKey().getName())
-					.nextFireTime(nuovaData)
-					.tipo(Tipo.ISTANTANEA.name())
-					.build();
+			ScheduledEvent info = ScheduledEvent.builder().email(email).id(detail.getKey().getName())
+					.nextFireTime(nuovaData).tipo(Tipo.ISTANTANEA.name()).status(EventStatus.Active).build();
 			repositoryService.save(info);
 			return info;
 		} catch (Exception e) {
@@ -125,12 +146,9 @@ public class SchedulerService {
 			if (scheduler.rescheduleJob(triggerKey, trigger) == null) {
 				return new ScheduledEvent();
 			}
-	
-			ScheduledEvent info = ScheduledEvent.builder()
-					.email((Email)detail.getJobDataMap().get("email"))
-					.id(detail.getKey().getName())
-					.cron(cron)
-					.tipo(Tipo.PERIODICO.name())
+
+			ScheduledEvent info = ScheduledEvent.builder().email((Email) detail.getJobDataMap().get("email"))
+					.id(detail.getKey().getName()).cron(cron).tipo(Tipo.PERIODICO.name()).status(EventStatus.Active)
 					.build();
 			repositoryService.save(info);
 			return info;
@@ -139,70 +157,57 @@ public class SchedulerService {
 		}
 	}
 
-	public void rescheduleAvvio() { 
-		List<ScheduledEvent> infos = repositoryService.getAll();
-		
-		repositoryService.deleteAll();
-		
+	public void rescheduleAvvio() {
+		List<ScheduledEvent> infos = repositoryService.getAllByStatus(EventStatus.Active);
+		repositoryService.deleteAll(infos);
 		try {
 			for (ScheduledEvent scheduledInfo : infos) {
 				JobDetail detail = buildJobDetail(scheduledInfo.getEmail());
 				Trigger trigger;
-				
+
 				if (scheduledInfo.getTipo().equals(Tipo.PERIODICO.name())) {
 					trigger = buildCronJobTrigger(detail, scheduledInfo.getCron());
 				} else {
 					trigger = buildJobTrigger(detail, scheduledInfo.getNextFireTime());
-					logger.info("JOB rischedulato");
 				}
-				
+				logger.info("JOB rischedulato");
 				scheduler.scheduleJob(detail, trigger);
-				
+
 				scheduledInfo.setId(detail.getKey().getName());
 				repositoryService.save(scheduledInfo);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+
 		}
 	}
-	
+
 	public List<ScheduledEvent> getAll() {
 		return repositoryService.getAll();
 	}
-	
-    private JobDetail buildJobDetail(Email email) {
-    	JobDataMap dataMap = new JobDataMap();
-    	dataMap.put("email", email);
-		return JobBuilder.newJob(NotificationJob.class)
-				.withIdentity(email.getEventID(), "calendar")
-				.usingJobData(dataMap)
-                .withDescription("Job scheduler for notification")
-                .build();
-    }
-    
-    private Trigger buildJobTrigger(JobDetail detail, Date dataEsecuzione) {
-    	return buildJobTrigger(detail, dataEsecuzione, detail.getKey().getName());
-    }
-    
-    private Trigger buildJobTrigger(JobDetail detail, Date dataEsecuzione, String id) {
-    	return TriggerBuilder.newTrigger()
-				.forJob(detail)
-				.withIdentity(id, detail.getKey().getGroup())
-				.withDescription(detail.getDescription())
-				.startAt(Date.from(dataEsecuzione.toInstant()))
-				.build();
+
+	private JobDetail buildJobDetail(Email email) {
+		JobDataMap dataMap = new JobDataMap();
+		dataMap.put("email", email);
+		return JobBuilder.newJob(NotificationJob.class).withIdentity(email.getEventID(), "calendar")
+				.usingJobData(dataMap).withDescription("Job scheduler for notification").build();
 	}
-    
-    private CronTrigger buildCronJobTrigger(JobDetail detail, String cron) {
-    	return buildCronJobTrigger(detail, cron, detail.getKey().getName());
+
+	private Trigger buildJobTrigger(JobDetail detail, Date dataEsecuzione) {
+		return buildJobTrigger(detail, dataEsecuzione, detail.getKey().getName());
 	}
-    
-    private CronTrigger buildCronJobTrigger(JobDetail detail, String cron, String id) {
-    	return TriggerBuilder.newTrigger()
-				.forJob(detail)
-				.withIdentity(id, detail.getKey().getGroup())
-				.withDescription(detail.getDescription())
-				.withSchedule(CronScheduleBuilder.cronSchedule(cron))
-				.build();
+
+	private Trigger buildJobTrigger(JobDetail detail, Date dataEsecuzione, String id) {
+		return TriggerBuilder.newTrigger().forJob(detail).withIdentity(id, detail.getKey().getGroup())
+				.withDescription(detail.getDescription()).startAt(Date.from(dataEsecuzione.toInstant())).build();
+	}
+
+	private CronTrigger buildCronJobTrigger(JobDetail detail, String cron) {
+		return buildCronJobTrigger(detail, cron, detail.getKey().getName());
+	}
+
+	private CronTrigger buildCronJobTrigger(JobDetail detail, String cron, String id) {
+		return TriggerBuilder.newTrigger().forJob(detail).withIdentity(id, detail.getKey().getGroup())
+				.withDescription(detail.getDescription()).withSchedule(CronScheduleBuilder.cronSchedule(cron)).build();
 	}
 }

@@ -84,7 +84,7 @@ public class MeetingEventController {
 		meetingService.delete(event);
 		Email email = emailBuilder.buildFromMeetingEvent(event, "eliminato");
 		notificator.mandaNotifica(email);
-		boolean deleted = schedulerService.deleteNotifica(toBeDeleted.getID());
+		boolean deleted = schedulerService.disactiveNotification(toBeDeleted.getID());
 		return new ResponseEntity<>(
 				Response.<String>builder().body(deleted ? "OK" : "Error")
 						.code(deleted ? HttpStatus.OK.value() : HttpStatus.BAD_REQUEST.value())
