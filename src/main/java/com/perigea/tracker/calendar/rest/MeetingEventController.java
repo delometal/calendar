@@ -1,5 +1,6 @@
 package com.perigea.tracker.calendar.rest;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -64,7 +65,7 @@ public class MeetingEventController {
 	}
 	
 	@PutMapping(path = "/meeting/update-meeting")
-	public ResponseEntity<Response<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent) {
+	public ResponseEntity<Response<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent, @RequestBody List<String> filePath) {
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		meetingService.update(event);
 		Email email = emailBuilder.buildFromMeetingEvent(event, "modificato");
@@ -79,7 +80,7 @@ public class MeetingEventController {
 	}
 
 	@DeleteMapping(path = "/meeting/delete-meeting")
-	public ResponseEntity<Response<String>> deleteMeeting(@RequestBody MeetingEventDto toBeDeleted) {
+	public ResponseEntity<Response<String>> deleteMeeting(@RequestBody MeetingEventDto toBeDeleted, @RequestBody List<String> filePath) {
 		MeetingEvent event = mapper.mapToEntity(toBeDeleted);
 		meetingService.delete(event);
 		Email email = emailBuilder.buildFromMeetingEvent(event, "eliminato");
