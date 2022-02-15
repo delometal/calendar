@@ -14,6 +14,7 @@ public interface MeetingEventRepository extends MongoRepository<MeetingEvent, St
 
 	public List<MeetingEvent> findAllByStartDateBetween(Date from, Date to);
 
+	@Query(value = "{'eventCreator.mailAziendale': ?0}")
 	public List<MeetingEvent> findAllByEventCreator(String eventCreator);
 
 	@Query(value = "{'eventCreator.mailAziendale': ?2, 'startDate': {$gt: ?0, $lt: ?1}}")
