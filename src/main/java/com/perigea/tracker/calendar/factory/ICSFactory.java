@@ -21,6 +21,9 @@ public abstract class ICSFactory {
 		event.setUrl(meetingEvent.getLink());
 		
 		ical.addEvent(event);
+		
 		return Biweekly.write(ical).go().getBytes();
 	}
+	
+	
 }

@@ -9,9 +9,9 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.perigea.tracker.calendar.entity.Contact;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.repository.MeetingEventRepository;
-import com.perigea.tracker.commons.dto.EventContactDto;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 import com.perigea.tracker.commons.enums.ParticipationStatus;
 import com.perigea.tracker.commons.exception.EntityNotFoundException;
@@ -28,18 +28,18 @@ public class MeetingEventService {
 
 	public void save(MeetingEvent event) {
 		repository.save(event);
-		logger.info(String.format("Evento %s aggiunto in persistenza", event.getID()));
+		logger.info(String.format("Evento %s aggiunto in persistenza", event.getId()));
 
 	}
 
 	public void delete(MeetingEvent event) {
 		repository.delete(event);
-		logger.info(String.format("Evento %s cancellato", event.getID()));
+		logger.info(String.format("Evento %s cancellato", event.getId()));
 	}
 	
 	public void update(MeetingEvent event) {
-		if (findById(event.getID()) == null){
-			throw new EntityNotFoundException(event.getID() + " not found");
+		if (findById(event.getId()) == null){
+			throw new EntityNotFoundException(event.getId() + " not found");
 		}
 		
 		repository.save(event);
@@ -110,22 +110,22 @@ public class MeetingEventService {
 		if (event == null) {
 			throw new EntityNotFoundException("Meeting non trovato");
 		}
-		List<EventContactDto> participants = event.getParticipants();
+		List<Contact> participants = event.getParticipants();
 
-		Optional<EventContactDto> optionalParticipant = participants.stream()
+		Optional<Contact> optionalParticipant = participants.stream()
 				.filter(p -> p.getCodicePersona().equals(participantId)).findFirst();
 
 		if (optionalParticipant.isEmpty()) {
 			throw new EntityNotFoundException("Partecipante non trovato");
 		}
 
-		EventContactDto participant = optionalParticipant.get();
+		Contact participant = optionalParticipant.get();
 		participant.setParticipationStatus(status);
 		participants.removeIf(p -> p.getCodicePersona().equals(participantId));
 		participants.add(participant);
 		event.setParticipants(participants);
 		repository.save(event);
-		logger.info(String.format("Evento %s aggiornato", event.getID()));
+		logger.info(String.format("Evento %s aggiornato", event.getId()));
 		return true;
 	}
 }

@@ -9,81 +9,81 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.perigea.tracker.calendar.entity.LeaveEvent;
-import com.perigea.tracker.calendar.repository.LeaveEventRepository;
+import com.perigea.tracker.calendar.entity.HolidayEvent;
+import com.perigea.tracker.calendar.repository.HolidayEventRepository;
 import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 import com.perigea.tracker.commons.exception.EntityNotFoundException;
-import com.perigea.tracker.commons.exception.LeaveEventException;
+import com.perigea.tracker.commons.exception.HolidayEventException;
 
 @Service
-public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
+public class HolidayEventService {// implements EventServiceStrategy<HolidayEvent> {
 
 	@Autowired
-	private LeaveEventRepository repository;
+	private HolidayEventRepository repository;
 
 	@Autowired
 	private Logger logger;
 
-	public void save(LeaveEvent event) {
+	public void save(HolidayEvent event) {
 		repository.save(event);
 		logger.info(String.format("%s aggiunto in persistenza", event.getType()));
 
 	}
 
-	public void delete(LeaveEvent event) {
+	public void delete(HolidayEvent event) {
 		repository.delete(event);
 		logger.info(String.format("%s rimosso", event.getType()));
 
 	}
 	
-	public void update(LeaveEvent event) {
-		if (repository.findById(event.getID()).isEmpty()) {
-			throw new EntityNotFoundException(event.getID() + " not found");
+	public void update(HolidayEvent event) {
+		if (repository.findById(event.getId()).isEmpty()) {
+			throw new EntityNotFoundException(event.getId() + " not found");
 		}
-		System.out.println(repository.findById(event.getID()));
+		System.out.println(repository.findById(event.getId()));
 		repository.save(event);
 	}
 
-	public List<LeaveEvent> getEventsBetween(Date from, Date to) {
+	public List<HolidayEvent> getEventsBetween(Date from, Date to) {
 		try {
 			return repository.findAllByStartDateBetween(from, to);
 		} catch (Exception ex) {
-			throw new LeaveEventException(ex.getMessage());
+			throw new HolidayEventException(ex.getMessage());
 		}
 	}
 
-	public List<LeaveEvent> findAllByEventCreator(String mailAziendaleCreator) {
+	public List<HolidayEvent> findAllByEventCreator(String mailAziendaleCreator) {
 		try {
 			return repository.findAllByEventCreator(mailAziendaleCreator);
 		} catch (Exception ex) {
 			if (ex instanceof NoSuchElementException) {
 				throw new EntityNotFoundException(ex.getMessage());
 			}
-			throw new LeaveEventException(ex.getMessage());
+			throw new HolidayEventException(ex.getMessage());
 		}
 	}
 
-	public List<LeaveEvent> findAllByResponsabile(String mailAziendaleResponsabile) {
+	public List<HolidayEvent> findAllByResponsabile(String mailAziendaleResponsabile) {
 		try {
 			return repository.findByResponsabile(mailAziendaleResponsabile);
 		} catch (Exception ex) {
 			if (ex instanceof NoSuchElementException) {
 				throw new EntityNotFoundException(ex.getMessage());
 			}
-			throw new LeaveEventException(ex.getMessage());
+			throw new HolidayEventException(ex.getMessage());
 		}
 	}
 
-	public List<LeaveEvent> findAllByType(CalendarEventType type) {
+	public List<HolidayEvent> findAllByType(CalendarEventType type) {
 		try {
 			return repository.findAllByType(type);
 		} catch (Exception ex) {
-			throw new LeaveEventException(ex.getMessage());
+			throw new HolidayEventException(ex.getMessage());
 		}
 	}
 
-	public List<LeaveEvent> findAllByDateCreatorType(Date from, Date to, String mailAziendaleCreator,
+	public List<HolidayEvent> findAllByDateCreatorType(Date from, Date to, String mailAziendaleCreator,
 			CalendarEventType type) {
 		try {
 			return repository.findAllByStartDateBetweenByCreatorByType(from, to, mailAziendaleCreator, type);
@@ -91,11 +91,11 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 			if (ex instanceof NoSuchElementException) {
 				throw new EntityNotFoundException(ex.getMessage());
 			}
-			throw new LeaveEventException(ex.getMessage());
+			throw new HolidayEventException(ex.getMessage());
 		}
 	}
 
-	public List<LeaveEvent> findAllByDateResponsabileType(Date from, Date to, String mailAziendaleResponsabile,
+	public List<HolidayEvent> findAllByDateResponsabileType(Date from, Date to, String mailAziendaleResponsabile,
 			CalendarEventType type) {
 		try {
 			return repository.findAllByStartDateBetweenByResponsabileByType(from, to, mailAziendaleResponsabile, type);
@@ -103,31 +103,31 @@ public class LeaveEventService {// implements EventServiceStrategy<LeaveEvent> {
 			if (ex instanceof NoSuchElementException) {
 				throw new EntityNotFoundException(ex.getMessage());
 			}
-			throw new LeaveEventException(ex.getMessage());
+			throw new HolidayEventException(ex.getMessage());
 		}
 	}
 
-	public LeaveEvent updateApprovalStatus(String ID, ApprovalStatus status) {
+	public HolidayEvent updateApprovalStatus(String ID, ApprovalStatus status) {
 		try {
-			LeaveEvent event = findById(ID);
+			HolidayEvent event = findById(ID);
 			event.setApproved(status);
 			repository.save(event);
 			logger.info(String.format("Evento %s aggiornato", event.getType()));
 			return event;
 		} catch (Exception ex) {
-			throw new LeaveEventException(ex.getMessage());
+			throw new HolidayEventException(ex.getMessage());
 		}
 	}
 
-	public LeaveEvent findById(String leaveId) {
+	public HolidayEvent findById(String leaveId) {
 		try {
-			Optional<LeaveEvent> optionalEvent = repository.findById(leaveId);
+			Optional<HolidayEvent> optionalEvent = repository.findById(leaveId);
 			return optionalEvent.isPresent() ? optionalEvent.get() : null;
 		} catch (Exception ex) {
 			if (ex instanceof NoSuchElementException) {
 				throw new EntityNotFoundException(ex.getMessage());
 			}
-			throw new LeaveEventException(ex.getMessage());
+			throw new HolidayEventException(ex.getMessage());
 		}
 	}
 }

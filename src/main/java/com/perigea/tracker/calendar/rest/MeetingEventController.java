@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,9 +25,11 @@ import com.perigea.tracker.calendar.service.MeetingEventService;
 import com.perigea.tracker.calendar.service.MeetingRoomService;
 import com.perigea.tracker.calendar.service.SchedulerService;
 import com.perigea.tracker.commons.dto.MeetingEventDto;
+import com.perigea.tracker.commons.dto.ResponseDto;
 import com.perigea.tracker.commons.model.Email;
 
 @RestController
+@RequestMapping(path = "/meeting")
 public class MeetingEventController {
 
 	@Autowired
@@ -47,104 +50,103 @@ public class MeetingEventController {
 	@Autowired
 	private MeetingMapper mapper;
 
-	@PostMapping(path = "/meeting/create-meeting")
-	public ResponseEntity<Response<MeetingEventDto>> addMeeting(@RequestBody MeetingEventDto meetingEvent) {
+	@PostMapping(path = "/create-meeting")
+	public ResponseEntity<ResponseDto<MeetingEventDto>> addMeeting(@RequestBody MeetingEventDto meetingEvent) {
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		meetingService.save(event);
-		Email email = emailBuilder.buildFromMeetingEvent(event, "creato");
-		notificator.mandaNotifica(email);
+		Email email = emailBuilder.build(event, "creato");
+		notificator.send(email);
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(meetingEvent.getStartDate());
 		cal.add(Calendar.MINUTE, -15);
 		Date notificationDate = cal.getTime();
-		schedulerService.scheduleNotifica(notificationDate, emailBuilder.buildReminderEmail(event));
-		return new ResponseEntity<>(Response.<MeetingEventDto>builder().body(meetingEvent).code(HttpStatus.OK.value())
+		schedulerService.scheduleNotifica(notificationDate, emailBuilder.buildReminder(event));
+		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}
 	
-	@PutMapping(path = "/meeting/update-meeting")
-	public ResponseEntity<Response<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent) {
+	@PutMapping(path = "/update-meeting")
+	public ResponseEntity<ResponseDto<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent, @RequestBody List<String> filePath) {
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		meetingService.update(event);
-		Email email = emailBuilder.buildFromMeetingEvent(event, "modificato");
-		notificator.mandaNotifica(email);
+		Email email = emailBuilder.build(event, "modificato");
+		notificator.send(email);
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(meetingEvent.getStartDate());
 		cal.add(Calendar.MINUTE, -15);
 		Date notificationDate = cal.getTime();
-		schedulerService.reschedule(notificationDate, email.getEventID(), emailBuilder.buildReminderEmail(event));
-		return new ResponseEntity<>(Response.<MeetingEventDto>builder().body(meetingEvent).code(HttpStatus.OK.value())
+		schedulerService.reschedule(notificationDate, email.getEventID(), emailBuilder.buildReminder(event));
+		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting aggiornato nel calendario").build(), HttpStatus.OK);
 	}
 
-	@DeleteMapping(path = "/meeting/delete-meeting")
-	public ResponseEntity<Response<String>> deleteMeeting(@RequestBody MeetingEventDto toBeDeleted) {
+	@DeleteMapping(path = "/delete-meeting")
+	public ResponseEntity<ResponseDto<String>> deleteMeeting(@RequestBody MeetingEventDto toBeDeleted, @RequestBody List<String> filePath) {
 		MeetingEvent event = mapper.mapToEntity(toBeDeleted);
 		meetingService.delete(event);
-		Email email = emailBuilder.buildFromMeetingEvent(event, "eliminato");
-		notificator.mandaNotifica(email);
+		Email email = emailBuilder.build(event, "eliminato");
+		notificator.send(email);
 		boolean deleted = schedulerService.disactiveNotification(toBeDeleted.getID());
 		return new ResponseEntity<>(
-				Response.<String>builder().body(deleted ? "OK" : "Error")
+				ResponseDto.<String>builder().data(deleted ? "OK" : "Error")
 						.code(deleted ? HttpStatus.OK.value() : HttpStatus.BAD_REQUEST.value())
 						.build(),
 				HttpStatus.OK);
 	}
 
 	
-	@GetMapping(path = "/meeting/get-by-creator", params = { "creator" })
-	public ResponseEntity<Response<List<MeetingEventDto>>> getAllByCreator(@RequestParam String mailAziendaleCreator) {
+	@GetMapping(path = "/get-by-creator", params = { "creator" })
+	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllByCreator(@RequestParam String mailAziendaleCreator) {
 		// finestra di tempo simmetrica di due mesi
 		Calendar cal = new GregorianCalendar();
 		cal.add(Calendar.MONTH, -1);
 		Date from = cal.getTime();
 		cal.add(Calendar.MONTH, 2);
 		Date to = cal.getTime();
-
 		return getAllInDateRangeByCreator(from, to, mailAziendaleCreator);
 	}
 
-	@GetMapping(path = "/meeting/get-meetings-in-date-range", params = { "from", "to" })
-	public ResponseEntity<Response<List<MeetingEventDto>>> getAllInDateRange(
+	@GetMapping(path = "/get-meetings-in-date-range", params = { "from", "to" })
+	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRange(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to) {
 
 		List<MeetingEvent> events = meetingService.getEventsBetween(from, to);
 		List<MeetingEventDto> meetings = mapper.mapToDtoList(events);
-		return new ResponseEntity<Response<List<MeetingEventDto>>>(Response.<List<MeetingEventDto>>builder()
-				.body(meetings).description(String.format("Tutti i meeting tra il %s e il %s", from, to))
+		return new ResponseEntity<ResponseDto<List<MeetingEventDto>>>(ResponseDto.<List<MeetingEventDto>>builder()
+				.data(meetings).description(String.format("Tutti i meeting tra il %s e il %s", from, to))
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
 	}
 
-	@GetMapping(path = "/meeting", params = { "from", "to", "creator" })
-	public ResponseEntity<Response<List<MeetingEventDto>>> getAllInDateRangeByCreator(
+	@GetMapping(path = "/all-by-range-and-creator", params = { "from", "to", "creator" })
+	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRangeByCreator(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
 			@RequestParam String mailAziendaleCreator) {
 
 		List<MeetingEvent> events = meetingService.getEventsBetweenByCreator(from, to, mailAziendaleCreator);
 		List<MeetingEventDto> meetings = mapper.mapToDtoList(events);
-		return new ResponseEntity<Response<List<MeetingEventDto>>>(Response.<List<MeetingEventDto>>builder()
-				.body(meetings)
+		return new ResponseEntity<ResponseDto<List<MeetingEventDto>>>(ResponseDto.<List<MeetingEventDto>>builder()
+				.data(meetings)
 				.description(String.format("Tutti i meeting di %s tra il %s e il %s", mailAziendaleCreator, from, to))
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
 	}
 
 	@GetMapping(path = "/room-availability-in-range", params = { "from", "to" })
-	public ResponseEntity<Response<Boolean>> checkAvailability(
+	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to) {
-		return new ResponseEntity<>(Response.<Boolean>builder().body(roomService.isFree(from, to))
+		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(from, to))
 				.description(String.format("Disponibiltà sala riunioni da %s a %s", from.toString(), to.toString()))
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
 	}
 
 	@GetMapping(path = "/room-availability", params = { "instant" })
-	public ResponseEntity<Response<Boolean>> checkAvailability(
+	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date instant) {
 
-		return new ResponseEntity<>(Response.<Boolean>builder().body(roomService.isFree(instant))
+		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(instant))
 				// TODO dicitura un po' fuorviante
 				.description(String.format("Disponibiltà sala riunioni in data %s", instant.toString()))
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);

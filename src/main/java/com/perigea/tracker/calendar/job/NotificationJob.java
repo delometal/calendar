@@ -19,7 +19,7 @@ public class NotificationJob implements Job {
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		notificationRestClient.mandaNotifica((Email)context.getJobDetail().getJobDataMap().get("email"));
+		notificationRestClient.send((Email)context.getJobDetail().getJobDataMap().get("email"));
 	}
 
 }

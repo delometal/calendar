@@ -16,7 +16,7 @@ public class NotificationRestClient {
 	@Value("${notificator.endpoint}")
 	private String endpoint;
 	
-	public void mandaNotifica(Email email) {
+	public void send(Email email) {
 		restTemplate.postForObject(endpoint, email, String.class);
 	}
 }

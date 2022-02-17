@@ -1,24 +1,25 @@
 package com.perigea.tracker.calendar.entity;
 
-import com.perigea.tracker.commons.enums.EmployeeType;
+import java.io.Serializable;
+
+import com.perigea.tracker.commons.enums.AnagraficaType;
 import com.perigea.tracker.commons.enums.ParticipationStatus;
 
 import lombok.Data;
 
 @Data
-public class EventContact {
-	private Long id;
+public class Contact implements Serializable {
+	
+	private static final long serialVersionUID = 1380106797597898605L;
+	
+	private String codicePersona;
+	private String username;
 	private String nome;
 	private String cognome;
 	private String mailAziendale;
 	private String mailPrivata;
 	private String cellulare;
-	
-	//i campi seguenti non fanno parte di ContattoDto del tracker
-	private EmployeeType employeeType;
-	
-	//preferire questo come ID
-	private String codicePersona;
-
+	private AnagraficaType tipo;
 	private ParticipationStatus participationStatus;
+	
 }
