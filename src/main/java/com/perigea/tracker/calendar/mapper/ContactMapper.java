@@ -4,17 +4,17 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
-import com.perigea.tracker.calendar.entity.EventContact;
-import com.perigea.tracker.commons.dto.EventContactDto;
+import com.perigea.tracker.calendar.entity.Contact;
+import com.perigea.tracker.commons.dto.ContactDto;
 
 @Mapper(componentModel = "spring")
 public interface ContactMapper {
 	
-	EventContactDto mapToDto(EventContact source);
+	ContactDto mapToDto(Contact source);
 	
-	EventContact mapToEntity(EventContactDto source);
+	Contact mapToEntity(ContactDto source);
 	
-	List<EventContactDto> mapToDtoList(List<EventContact> source);
+	List<ContactDto> mapToDtoList(List<Contact> source);
 	
-	List<EventContact> mapToEntityList(List<EventContactDto> source);
+	List<Contact> mapToEntityList(List<ContactDto> source);
 }
