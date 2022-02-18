@@ -24,7 +24,6 @@ import com.perigea.tracker.commons.enums.EventStatus;
 import com.perigea.tracker.commons.exception.NotificationSchedulerException;
 import com.perigea.tracker.commons.model.Email;
 
-// TODO: adattare classe agli eventi del calendar
 
 @Service
 public class SchedulerService {

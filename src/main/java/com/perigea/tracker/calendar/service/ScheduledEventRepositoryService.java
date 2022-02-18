@@ -5,9 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.perigea.tracker.calendar.entity.ArchivedEvent;
 import com.perigea.tracker.calendar.entity.ScheduledEvent;
-import com.perigea.tracker.calendar.repository.ArchivedEventRepository;
 import com.perigea.tracker.calendar.repository.ScheduledEventRepository;
 import com.perigea.tracker.commons.enums.EventStatus;
 

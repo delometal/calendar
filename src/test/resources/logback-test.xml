@@ -1,0 +1,78 @@
+<!DOCTYPE xml>
+<configuration scan="true" scanPeriod="20 seconds">
+
+	<springProperty scope="context" name="LOG_PATH" source="logging.path" />
+	<springProperty scope="context" name="LOG_FILE" source="logging.file" />
+	<springProperty scope="context" name="LOG_LEVEL" source="logging.level" />
+    
+    <appender name="CONSOLE"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+				%date{ISO8601} [%thread] %-5level %logger %M - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+    
+	<appender name="ROLLING_FILE_LOGGER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%date{ISO8601} [%thread] %-5level %logger %M - %msg%n
+			</Pattern>
+		</encoder>
+		<file>${LOG_PATH}/${LOG_FILE}.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/archived/${LOG_FILE}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>30MB</maxFileSize>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>200MB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+         </rollingPolicy>
+	</appender>
+	
+	<logger name="com.perigea" level="${LOG_LEVEL}" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
+		<appender-ref ref="CONSOLE" />
+	</logger>
+		<logger name="com.perigea.tracker" level="${LOG_LEVEL}" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator" level="off" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="org.springframework.data.mongodb.core.index.ReactiveMongoPersistentEntityIndexCreator" level="off" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
+		<appender-ref ref="CONSOLE" />
+	</logger>		
+	<logger name="org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexCreator" level="off" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER"/>
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="springfox.documentation" level="off" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER"/>
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="org.springframework.beans.factory.support" level="off" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER"/>
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="org.springframework.context.annotation" level="off" additivity="false">	
+		<appender-ref ref="ROLLING_FILE_LOGGER"/>
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="logging.level.org.springframework.boot.autoconfigure" level="error" additivity="false">	
+		<appender-ref ref="ROLLING_FILE_LOGGER"/>
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<logger name="org.quartz" level="INFO" additivity="false">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	<root level="${LOG_LEVEL}">
+		<appender-ref ref="ROLLING_FILE_LOGGER" />
+		<appender-ref ref="CONSOLE" />
+	</root>
+	
+</configuration>

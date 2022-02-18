@@ -5,19 +5,20 @@ import java.util.List;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import com.perigea.tracker.commons.dto.EventContactDto;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@Document (collection = "meeting_event")
+@Document (collection = "event_meeting")
 @EqualsAndHashCode(callSuper=false)
 public class MeetingEvent extends CalendarEvent {
 
+	private static final long serialVersionUID = 6217270905717232791L;
+
 	@Field
-	private List<EventContactDto> participants;
+	private List<Contact> participants;
 	
 	@Field 
 	private boolean meetingRoom;
