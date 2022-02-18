@@ -22,7 +22,6 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 	@Value("${mongo.database.name}")
 	private String databaseName;
 	
-	// TODO cambiare il nome! attualmente è "test"
 	@Value("${mongo.address}")
 	private String mongoAddress;
  

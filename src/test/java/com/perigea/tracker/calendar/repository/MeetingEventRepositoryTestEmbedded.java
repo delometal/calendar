@@ -4,32 +4,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.perigea.tracker.calendar.configuration.MongoConfig;
 import com.perigea.tracker.calendar.entity.Contact;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 
+//TODO Utility class da estendere per test
+
 @DataMongoTest
-@ContextConfiguration(classes = {MongoConfig.class})
-public class MeetingEventRepositoryTest {
+@ExtendWith(SpringExtension.class)
+//@ContextConfiguration(classes = {MongoConfig.class})
+public class MeetingEventRepositoryTestEmbedded {
+
+//	@Autowired
+//	MongoTemplate template;
 	
 	@Autowired
 	private MeetingEventRepository repository;
-	
-	private static Contact contact;
-	private static Contact secondContact;
-	private static MeetingEvent event;
-	private static MeetingEvent secondEvent;
+	private Contact contact;
+	private Contact secondContact;
+	private MeetingEvent event;
+	private MeetingEvent secondEvent;
 	private static final Integer TOTAL = 2;
 	
-	@BeforeAll
-	public static void dataSetup(@Autowired MeetingEventRepository repository) {
+	@BeforeEach
+	public void dataSetup() {
 		contact = new Contact();
 		event = new MeetingEvent();
 		secondEvent = new MeetingEvent();
@@ -39,7 +44,7 @@ public class MeetingEventRepositoryTest {
 		contact.setCodicePersona("UniqueID");
 		
 		secondContact.setMailAziendale("nobody@nothing.it");
-		secondContact.setCodicePersona("MoreUniqueID");
+		secondContact.setCodicePersona("MoreUniqueId");
 		
 		event.setEventCreator(contact);
 		event.setType(CalendarEventType.Riunione);
