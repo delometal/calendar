@@ -17,7 +17,7 @@ import com.perigea.tracker.commons.enums.CalendarEventType;
 
 @DataMongoTest
 @ContextConfiguration(classes = {MongoConfig.class})
-public class MeetingEventRepositoryTest {
+class MeetingEventRepositoryTest {
 	
 	@Autowired
 	private MeetingEventRepository repository;

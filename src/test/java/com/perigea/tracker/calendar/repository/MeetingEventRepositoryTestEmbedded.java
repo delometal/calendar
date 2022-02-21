@@ -20,7 +20,7 @@ import com.perigea.tracker.commons.enums.CalendarEventType;
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
 //@ContextConfiguration(classes = {MongoConfig.class})
-public class MeetingEventRepositoryTestEmbedded {
+class MeetingEventRepositoryTestEmbedded {
 
 //	@Autowired
 //	MongoTemplate template;

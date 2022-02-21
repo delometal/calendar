@@ -1,6 +1,6 @@
 package com.perigea.tracker.calendar.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -10,10 +10,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 
@@ -23,8 +21,7 @@ import com.perigea.tracker.calendar.repository.MeetingEventRepository;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 
 @ExtendWith(MockitoExtension.class)
-@RunWith(MockitoJUnitRunner.class)
-	public class MeetingEventServiceTest {
+class MeetingEventServiceTest {
 
 	@Mock
 	private	MeetingEventRepository repository;

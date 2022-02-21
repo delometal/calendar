@@ -47,28 +47,10 @@
 			<version>3.1.0</version>
 		</dependency>
 
-		<!-- Test -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.mockito</groupId>
-	    	<artifactId>mockito-core</artifactId>
-	    	<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-		    <groupId>de.flapdoodle.embed</groupId>
-		    <artifactId>de.flapdoodle.embed.mongo</artifactId>
-		    <scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -105,7 +87,6 @@
 			<artifactId>springfox-swagger2</artifactId>
 			<version>2.6.1</version>
 		</dependency>
-		
 
 		<dependency>
 			<groupId>io.springfox</groupId>
@@ -118,22 +99,17 @@
 			<artifactId>biweekly</artifactId>
 			<version>0.6.6</version>
 		</dependency>
-<!-->
-    <dependency>
-        <groupId>de.flapdoodle.embed</groupId>
-        <artifactId>de.flapdoodle.embed.mongo</artifactId>
-        <scope>test</scope>
-    </dependency>
-<-->
+		<!--> <dependency> <groupId>de.flapdoodle.embed</groupId> <artifactId>de.flapdoodle.embed.mongo</artifactId> 
+			<scope>test</scope> </dependency> < -->
 	</dependencies>
 
 	<build>
 		<plugins>
-			
-			    <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          </plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
