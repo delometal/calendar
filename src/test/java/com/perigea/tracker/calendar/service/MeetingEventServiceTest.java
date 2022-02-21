@@ -24,7 +24,7 @@ import com.perigea.tracker.commons.enums.CalendarEventType;
 
 @ExtendWith(MockitoExtension.class)
 @RunWith(MockitoJUnitRunner.class)
-	public class MeetingEventServiceTest {
+public class MeetingEventServiceTest {
 
 	@Mock
 	private	MeetingEventRepository repository;
