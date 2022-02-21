@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -96,21 +97,21 @@ public class MeetingEventController {
 	}
 
 	
-	@GetMapping(path = "/get-by-creator", params = { "creator" })
-	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllByCreator(@RequestParam String mailAziendaleCreator) {
+	@GetMapping(path = "/get-by-creator/{mailCreator}")
+	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllByCreator(@PathVariable String mailCreator) {
 		// finestra di tempo simmetrica di due mesi
 		Calendar cal = new GregorianCalendar();
 		cal.add(Calendar.MONTH, -1);
 		Date from = cal.getTime();
 		cal.add(Calendar.MONTH, 2);
 		Date to = cal.getTime();
-		return getAllInDateRangeByCreator(from, to, mailAziendaleCreator);
+		return getAllInDateRangeByCreator(from, to, mailCreator);
 	}
 
-	@GetMapping(path = "/get-meetings-in-date-range", params = { "from", "to" })
+	@GetMapping(path = "/get-meetings-in-date-range/{from}/{to}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRange(
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to) {
+			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
+			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to) {
 
 		List<MeetingEvent> events = meetingService.getEventsBetween(from, to);
 		List<MeetingEventDto> meetings = mapper.mapToDtoList(events);
@@ -119,32 +120,32 @@ public class MeetingEventController {
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
 	}
 
-	@GetMapping(path = "/all-by-range-and-creator", params = { "from", "to", "creator" })
+	@GetMapping(path = "/all-by-range-and-creator/{from}/{to}/{mailCreator}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRangeByCreator(
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
-			@RequestParam String mailAziendaleCreator) {
+			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
+			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
+			@PathVariable String mailCreator) {
 
-		List<MeetingEvent> events = meetingService.getEventsBetweenByCreator(from, to, mailAziendaleCreator);
+		List<MeetingEvent> events = meetingService.getEventsBetweenByCreator(from, to, mailCreator);
 		List<MeetingEventDto> meetings = mapper.mapToDtoList(events);
 		return new ResponseEntity<ResponseDto<List<MeetingEventDto>>>(ResponseDto.<List<MeetingEventDto>>builder()
 				.data(meetings)
-				.description(String.format("Tutti i meeting di %s tra il %s e il %s", mailAziendaleCreator, from, to))
+				.description(String.format("Tutti i meeting di %s tra il %s e il %s", mailCreator, from, to))
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
 	}
 
-	@GetMapping(path = "/room-availability-in-range", params = { "from", "to" })
+	@GetMapping(path = "/room-availability-in-range/{from}/{to}")
 	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to) {
+			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
+			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to) {
 		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(from, to))
 				.description(String.format("Disponibiltà sala riunioni da %s a %s", from.toString(), to.toString()))
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
 	}
 
-	@GetMapping(path = "/room-availability", params = { "instant" })
+	@GetMapping(path = "/room-availability/{instant}")
 	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date instant) {
+			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date instant) {
 
 		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(instant))
 				// TODO dicitura un po' fuorviante

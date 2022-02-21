@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,14 +37,14 @@ public class SchedulerRestController {
 //		return new ResponseEntity<>(service.scheduleNotificaPeriodica(cron), HttpStatus.OK);
 //	}
 //	
-	@GetMapping(path = "pause")
-	public ResponseEntity<String> pause(@RequestParam String id) throws SchedulerException{
+	@GetMapping(path = "pause/{id}")
+	public ResponseEntity<String> pause(@PathVariable String id) throws SchedulerException{
 		
 		return new ResponseEntity<>(service.pauseNotification(id), HttpStatus.OK);
 	}
 	
-	@GetMapping(path = "delete")
-	public ResponseEntity<String> delete(@RequestParam String id) throws SchedulerException{
+	@GetMapping(path = "delete/{id}")
+	public ResponseEntity<String> delete(@PathVariable String id) throws SchedulerException{
 		
 		return new ResponseEntity<>(service.disactiveNotification(id) ? "Deleted" : "Not found", HttpStatus.OK);
 	}
@@ -55,9 +56,9 @@ public class SchedulerRestController {
 //		return new ResponseEntity<>(service.reschedule(data, id), HttpStatus.OK);
 //	}
 	
-	@GetMapping(path = "reschedule", params = {"id", "cron"})
-	public ResponseEntity<ScheduledEvent> reschedule(@RequestParam String id,
-			@RequestParam String cron) throws SchedulerException {
+	@GetMapping(path = "reschedule/{id}/{cron}")
+	public ResponseEntity<ScheduledEvent> reschedule(@PathVariable String id,
+			@PathVariable String cron) throws SchedulerException {
 		
 		return new ResponseEntity<>(service.reschedule(cron, id),	HttpStatus.OK);
 	}
