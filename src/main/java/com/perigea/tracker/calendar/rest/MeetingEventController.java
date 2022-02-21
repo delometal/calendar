@@ -42,6 +42,7 @@ public class MeetingEventController {
 	@Autowired
 	private EmailBuilderService emailBuilder;
 	
+	// TODO notificationService come nome
 	@Autowired
 	private NotificationRestClient notificator;
 	
@@ -148,7 +149,6 @@ public class MeetingEventController {
 			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date instant) {
 
 		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(instant))
-				// TODO dicitura un po' fuorviante
 				.description(String.format("Disponibiltà sala riunioni in data %s", instant.toString()))
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
 	}

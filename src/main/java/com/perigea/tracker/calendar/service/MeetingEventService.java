@@ -55,7 +55,7 @@ public class MeetingEventService {
 		}
 	}
 
-	public List<MeetingEvent> findAll(CalendarEventType type) {
+	public List<MeetingEvent> findAll() {
 		try {
 			return repository.findAll();
 		} catch (Exception ex) {

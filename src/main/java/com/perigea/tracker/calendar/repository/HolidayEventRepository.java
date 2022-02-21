@@ -13,9 +13,6 @@ public interface HolidayEventRepository extends MongoRepository<HolidayEvent, St
 
 	public List<HolidayEvent> findAllByType(CalendarEventType type);
 
-	// TODO alcuni dei seguenti metodi si possono estrarre e inserire in
-	// un'interfaccia comune a questo e l'altro repo
-	// lo stesso vale per i service
 	public List<HolidayEvent> findAllByStartDateBetween(Date from, Date to);
 
 	@Query(value = "{ 'eventCreator.mailAziendale': ?0}")

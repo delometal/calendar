@@ -33,7 +33,7 @@ public class SchedulerRestController {
 //	@GetMapping(path = "schedule_periodico")
 //	public ResponseEntity<ScheduledEvent> schedulePeriodico(@RequestParam String cron) {
 //		
-//		// FIXME NextFireTime = null
+//		
 //		return new ResponseEntity<>(service.scheduleNotificaPeriodica(cron), HttpStatus.OK);
 //	}
 //	

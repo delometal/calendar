@@ -19,10 +19,9 @@ import com.mongodb.client.MongoClients;
 @EnableMongoRepositories(basePackages = "com.perigea.tracker.calendar.repository")
 public class MongoConfig extends AbstractMongoClientConfiguration {
 	
-	@Value("${mongo.database_name}")
+	@Value("${mongo.database.name}")
 	private String databaseName;
 	
-	// TODO cambiare il nome! attualmente è "test"
 	@Value("${mongo.address}")
 	private String mongoAddress;
  
