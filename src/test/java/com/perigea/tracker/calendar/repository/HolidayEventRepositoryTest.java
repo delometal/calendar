@@ -16,7 +16,7 @@ import com.perigea.tracker.calendar.entity.HolidayEvent;
 
 @DataMongoTest
 @ContextConfiguration(classes = {MongoConfig.class})
-public class HolidayEventRepositoryTest {
+class HolidayEventRepositoryTest {
 	
 	@Autowired 
 	private HolidayEventRepository repository;

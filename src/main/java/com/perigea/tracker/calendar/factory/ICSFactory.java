@@ -19,6 +19,7 @@ public abstract class ICSFactory {
 		event.setDescription(meetingEvent.getDescription());
 		event.setOrganizer(meetingEvent.getEventCreator().getMailAziendale());
 		event.setUrl(meetingEvent.getLink());
+		event.setSummary(meetingEvent.getDescription());
 		
 		ical.addEvent(event);
 		

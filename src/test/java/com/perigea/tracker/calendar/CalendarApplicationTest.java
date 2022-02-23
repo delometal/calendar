@@ -1,13 +1,16 @@
-package com.perigea.tracker.calendar;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
-@SpringBootTest
-class CalendarApplicationTest {
-
-	@Test
-	void contextLoads() {
-	}
-
-}
+//package com.perigea.tracker.calendar;
+//
+//import static org.junit.jupiter.api.Assertions.assertTrue;
+//
+//import org.junit.jupiter.api.Test;
+//import org.springframework.boot.test.context.SpringBootTest;
+//
+//@SpringBootTest
+//class CalendarApplicationTest {
+//
+//	@Test
+//	void contextLoads() {
+//		assertTrue(true);
+//	}
+//
+//}
