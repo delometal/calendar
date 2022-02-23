@@ -7,16 +7,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,28 +24,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.perigea.tracker.calendar.entity.Contact;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.mapper.MeetingMapper;
-import com.perigea.tracker.calendar.repository.MeetingEventRepository;
 import com.perigea.tracker.calendar.service.EmailBuilderService;
 import com.perigea.tracker.calendar.service.MeetingEventService;
 import com.perigea.tracker.calendar.service.MeetingRoomService;
 import com.perigea.tracker.calendar.service.SchedulerService;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 
-//@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
-
-
-@RunWith(SpringRunner.class)
-@WebMvcTest(MeetingEventController.class)
+@AutoConfigureMockMvc
+@WebMvcTest(controllers = MeetingEventController.class)
 public class MeetingEventControllerTest {
 
 	@Autowired
 	private MockMvc mvc;
-	
-//	@MockBean 
-//	private MeetingEventService service;
-//	
-	@MockBean
-	private MeetingEventRepository repository;
 	
 	@MockBean
 	private MeetingEventService mockService;
@@ -85,6 +75,7 @@ public class MeetingEventControllerTest {
 		event1.setEventCreator(contact);
 		event1.setType(CalendarEventType.Riunione);
 		event1.setId("VeryUniqueID");
+		event1.setStartDate(new Date());
 		
 		event2.setEventCreator(secondContact);
 		event2.setType(CalendarEventType.Riunione);
@@ -112,7 +103,7 @@ public class MeetingEventControllerTest {
 		        .contentType(MediaType.APPLICATION_JSON)
 		        .accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.MeetingEvent.Id", is(id)));
+				.andExpect(jsonPath("$.data.id", is(id)));
 	}
 	
 }
