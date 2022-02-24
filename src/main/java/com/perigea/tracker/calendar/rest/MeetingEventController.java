@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.perigea.tracker.calendar.entity.MeetingEvent;
@@ -89,7 +88,7 @@ public class MeetingEventController {
 		meetingService.delete(event);
 		Email email = emailBuilder.build(event, "eliminato");
 		notificator.send(email);
-		boolean deleted = schedulerService.disactiveNotification(toBeDeleted.getID());
+		boolean deleted = schedulerService.disactiveNotification(toBeDeleted.getId());
 		return new ResponseEntity<>(
 				ResponseDto.<String>builder().data(deleted ? "OK" : "Error")
 						.code(deleted ? HttpStatus.OK.value() : HttpStatus.BAD_REQUEST.value())
