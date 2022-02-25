@@ -17,7 +17,7 @@ import com.perigea.tracker.commons.exception.EntityNotFoundException;
 import com.perigea.tracker.commons.exception.HolidayEventException;
 
 @Service
-public class HolidayEventService {// implements EventServiceStrategy<HolidayEvent> {
+public class HolidayEventService {
 
 	@Autowired
 	private HolidayEventRepository repository;

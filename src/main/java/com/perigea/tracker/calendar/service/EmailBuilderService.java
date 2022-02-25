@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 import com.perigea.tracker.calendar.entity.Contact;
 import com.perigea.tracker.calendar.entity.HolidayEvent;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
+import com.perigea.tracker.calendar.entity.TimesheetEvent;
 import com.perigea.tracker.calendar.factory.ICSFactory;
 import com.perigea.tracker.commons.dto.AttachmentDto;
+import com.perigea.tracker.commons.enums.EMese;
 import com.perigea.tracker.commons.enums.EmailType;
 import com.perigea.tracker.commons.model.Email;
 
@@ -75,6 +77,25 @@ public class EmailBuilderService {
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).attachments(attachments).build();
 
 	}
+	
+	public Email build(TimesheetEvent event, String azione) {
+		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("ECT"));
+		EMese mese = EMese.getByMonthId(event.getTimesheet().getMese());
+		List<String> recipient = new ArrayList<>();
+		recipient.add(event.getResponsabile().getMailAziendale());
+		Map<String, Object> templateData = new HashMap<>();
+		templateData.put("utente", event.getEventCreator().getMailAziendale());
+		templateData.put("eventType", event.getType());
+		templateData.put("azione", azione);
+		templateData.put("mese", mese.getDescription());
+		templateData.put("anno", event.getTimesheet().getAnno());
+		
+		return Email.builder().eventID(event.getId()).from(sender).templateName("timesheetTemplate.ftlh")
+				.templateModel(templateData)
+				.subject(String.format("%s %s: %s", event.getEventCreator().getNome(),
+						event.getEventCreator().getCognome(), event.getType()))
+				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
+	}
 
 	public Email build(HolidayEvent event, String azione) {
 		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("ECT"));
@@ -91,6 +112,26 @@ public class EmailBuilderService {
 				.templateModel(templateData)
 				.subject(String.format("%s %s: %s", event.getEventCreator().getNome(),
 						event.getEventCreator().getCognome(), event.getType()))
+				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
+	}
+	
+	public Email buildApproval(TimesheetEvent event) {
+		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("ECT"));
+		EMese mese = EMese.getByMonthId(event.getTimesheet().getMese());
+		List<String> recipient = new ArrayList<>();
+		recipient.add(event.getEventCreator().getMailAziendale());
+		Map<String, Object> templateData = new HashMap<>();
+		templateData.put("utente", event.getResponsabile().getMailAziendale());
+		templateData.put("eventType", event.getType());
+		templateData.put("azione", event.getApprovalStatus().toString().toLowerCase());
+		templateData.put("mese", mese.getDescription());
+		templateData.put("anno", event.getTimesheet().getAnno());
+		
+		return Email.builder().eventID(event.getId()).from(sender).templateName("timesheetTemplate.ftlh")
+				.templateModel(templateData)
+				.subject(String.format("%s %s: %s %s", event.getResponsabile().getNome(),
+						event.getResponsabile().getCognome(), event.getType(),
+						event.getApprovalStatus().toString().toLowerCase()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
 
