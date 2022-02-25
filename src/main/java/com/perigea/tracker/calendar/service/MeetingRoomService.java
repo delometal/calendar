@@ -10,6 +10,8 @@ import com.perigea.tracker.calendar.repository.MeetingEventRepository;
 @Service
 public class MeetingRoomService {
 	
+	// TODO stato sala riunioni da-a, non solo bool
+	
 	@Autowired
 	private MeetingEventRepository repository;
 	

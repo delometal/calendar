@@ -22,6 +22,7 @@ public class NotificationJob implements Job {
 	@Autowired
 	private SchedulerService schedulerService;
 
+	// TODO periodiche con scadenza
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		Email email = (Email)context.getJobDetail().getJobDataMap().get("email");

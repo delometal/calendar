@@ -27,6 +27,7 @@ import com.perigea.tracker.calendar.service.SchedulerService;
 import com.perigea.tracker.commons.dto.MeetingEventDto;
 import com.perigea.tracker.commons.dto.ResponseDto;
 import com.perigea.tracker.commons.model.Email;
+import com.perigea.tracker.commons.utils.Utils;
 
 @RestController
 @RequestMapping(path = "/meeting")
@@ -55,28 +56,24 @@ public class MeetingEventController {
 	public ResponseEntity<ResponseDto<MeetingEventDto>> addMeeting(@RequestBody MeetingEventDto meetingEvent) {
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
+		Email email = emailBuilder.build(event, "creato");		
+		Date notificationDate = Utils.shiftTime(event.getStartDate(), Utils.NOTIFICATION_SHIFT_AMOUNT);
+
 		meetingService.save(event);
-		Email email = emailBuilder.build(event, "creato");
 		notificator.send(email);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(meetingEvent.getStartDate());
-		cal.add(Calendar.MINUTE, -15);
-		Date notificationDate = cal.getTime();
 		schedulerService.scheduleNotifica(notificationDate, emailBuilder.buildReminder(event));
 		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}
 	
 	@PutMapping(path = "/update-meeting")
-	public ResponseEntity<ResponseDto<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent, @RequestBody List<String> filePath) {
+	public ResponseEntity<ResponseDto<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent) {
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
-		meetingService.update(event);
 		Email email = emailBuilder.build(event, "modificato");
+		Date notificationDate = Utils.shiftTime(event.getStartDate(), Utils.NOTIFICATION_SHIFT_AMOUNT);
+
+		meetingService.update(event);
 		notificator.send(email);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(meetingEvent.getStartDate());
-		cal.add(Calendar.MINUTE, -15);
-		Date notificationDate = cal.getTime();
 		schedulerService.reschedule(notificationDate, email.getEventID(), emailBuilder.buildReminder(event));
 		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting aggiornato nel calendario").build(), HttpStatus.OK);
