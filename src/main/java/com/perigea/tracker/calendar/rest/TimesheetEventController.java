@@ -39,7 +39,7 @@ public class TimesheetEventController {
 	private NotificationRestClient notificator;
 
 	@PostMapping(path = "/create")
-	public ResponseEntity<ResponseDto<TimesheetEventDto>> addHolidayEvent(
+	public ResponseEntity<ResponseDto<TimesheetEventDto>> createTimesheetEvent(
 			@RequestBody TimesheetEventDto timesheetEvent) {
 		TimesheetEvent event = timesheetMapper.mapToEntity(timesheetEvent);
 		Email email = emailBuilder.build(event, "creato");
@@ -52,7 +52,7 @@ public class TimesheetEventController {
 	}
 
 	@DeleteMapping(path = "/delete")
-	public ResponseEntity<ResponseDto<TimesheetEventDto>> deleteHolidayEvent(
+	public ResponseEntity<ResponseDto<TimesheetEventDto>> deleteTimesheetEvent(
 			@RequestBody TimesheetEventDto timesheetEvent) {
 		TimesheetEvent toBeDeleted = timesheetMapper.mapToEntity(timesheetEvent);
 		timesheetEventService.delete(toBeDeleted);
@@ -65,7 +65,7 @@ public class TimesheetEventController {
 	}
 
 	@PutMapping(path = "/update")
-	public ResponseEntity<ResponseDto<TimesheetEventDto>> updateHolidayEvent(
+	public ResponseEntity<ResponseDto<TimesheetEventDto>> updateTimesheetEvent(
 			@RequestBody TimesheetEventDto timesheetEvent) {
 		TimesheetEvent toBeUpdated = timesheetMapper.mapToEntity(timesheetEvent);
 		timesheetEventService.update(toBeUpdated);
