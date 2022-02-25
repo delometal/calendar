@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.perigea.tracker.calendar.entity.Contact;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.repository.MeetingEventRepository;
-import com.perigea.tracker.commons.enums.CalendarEventType;
 import com.perigea.tracker.commons.enums.ParticipationStatus;
 import com.perigea.tracker.commons.exception.EntityNotFoundException;
 import com.perigea.tracker.commons.exception.MeetingEventException;

@@ -38,7 +38,7 @@ public class SchedulerService {
 	private ScheduledEventRepositoryService repositoryService;
 
 	public ScheduledEvent scheduleNotifica(Date dataEsecuzione, Email email) {
-		JobDetail detail = buildJobDetail(email);
+		JobDetail detail = buildJobDetail(email, Tipo.ISTANTANEA.toString());
 		Trigger trigger = buildJobTrigger(detail, dataEsecuzione);
 		try {
 			Date nextFire = scheduler.scheduleJob(detail, trigger);
@@ -54,7 +54,7 @@ public class SchedulerService {
 	}
 
 	public ScheduledEvent scheduleNotificaPeriodica(String cron, Email email) {
-		JobDetail detail = buildJobDetail(email);
+		JobDetail detail = buildJobDetail(email, Tipo.PERIODICO.toString());
 		Trigger trigger = buildCronJobTrigger(detail, cron);
 		try {
 			Date nextFire = scheduler.scheduleJob(detail, trigger);
@@ -114,7 +114,8 @@ public class SchedulerService {
 	}
 
 	public ScheduledEvent reschedule(Date nuovaData, String id, Email email) {
-		JobDetail detail = buildJobDetail(email);
+		
+		JobDetail detail = buildJobDetail(email, repositoryService.getById(id).getTipo());
 		JobKey jobKey = new JobKey(id, "calendar");
 		try {
 			if (!scheduler.checkExists(jobKey)) {
@@ -161,7 +162,7 @@ public class SchedulerService {
 		repositoryService.deleteAll(infos);
 		try {
 			for (ScheduledEvent scheduledInfo : infos) {
-				JobDetail detail = buildJobDetail(scheduledInfo.getEmail());
+				JobDetail detail = buildJobDetail(scheduledInfo.getEmail(), scheduledInfo.getTipo());
 				Trigger trigger;
 
 				if (scheduledInfo.getTipo().equals(Tipo.PERIODICO.name())) {
@@ -185,9 +186,10 @@ public class SchedulerService {
 		return repositoryService.getAll();
 	}
 
-	private JobDetail buildJobDetail(Email email) {
+	private JobDetail buildJobDetail(Email email, String type) {
 		JobDataMap dataMap = new JobDataMap();
 		dataMap.put("email", email);
+		dataMap.put("type", type);
 		return JobBuilder.newJob(NotificationJob.class).withIdentity(email.getEventID(), "calendar")
 				.usingJobData(dataMap).withDescription("Job scheduler for notification").build();
 	}
