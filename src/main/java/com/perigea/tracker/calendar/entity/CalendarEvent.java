@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.perigea.tracker.commons.annotations.NotNull;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 
 import lombok.Data;
@@ -30,10 +31,12 @@ public abstract class CalendarEvent implements Serializable {
 	@Field
 	private List<Contact> conoscenzaCC;
 	
+	@NotNull
 	@Field
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
 	private Date startDate;
 	
+	@NotNull
 	@Field
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
 	private Date endDate;

@@ -18,7 +18,9 @@ import com.perigea.tracker.calendar.factory.ICSFactory;
 import com.perigea.tracker.commons.dto.AttachmentDto;
 import com.perigea.tracker.commons.enums.EMese;
 import com.perigea.tracker.commons.enums.EmailType;
+import com.perigea.tracker.commons.exception.NullFieldException;
 import com.perigea.tracker.commons.model.Email;
+import com.perigea.tracker.commons.utils.Utils;
 
 @Service
 public class EmailBuilderService {
@@ -32,24 +34,27 @@ public class EmailBuilderService {
 	public Email build(MeetingEvent event, String azione) {
 		DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipients = new ArrayList<>();
+		Map<String, Object> templateData = new HashMap<>();
+		List<AttachmentDto> attachments = new ArrayList<AttachmentDto>();
+		
+		String f = Utils.validatePojo(event);
+		if ( f != null)
+			throw new NullFieldException(String.format("%s must not be null!", f));
+		
 		for (Contact c : event.getParticipants()) {
 			recipients.add(c.getMailAziendale());
 		}
-		
-		List<AttachmentDto> attachments = new ArrayList<AttachmentDto>();
-//		attachments = addAttachments(list);
+		//attachments = addAttachments(list);
 		attachments.add(addICSFile(event));
-		
-		Map<String, Object> templateData = new HashMap<>();
 		templateData.put("creator",
-				String.format("%s %s", event.getEventCreator().getNome(), event.getEventCreator().getCognome()));
+		String.format("%s %s", event.getEventCreator().getNome(), event.getEventCreator().getCognome()));
 		templateData.put("eventType", event.getType());
 		templateData.put("dataInizio", DATE_FORMAT.format(event.getStartDate()));
 		templateData.put("dataFine", DATE_FORMAT.format(event.getEndDate()));
 		templateData.put("partecipanti", recipients);
 		templateData.put("azione", azione);
 		templateData.put("presenza", event.isInPerson());
-
+		
 		return Email.builder().eventID(event.getId()).from(sender).templateName("meetingTemplate.ftlh")
 				.templateModel(templateData).subject(String.format("%s: %s", event.getType(), event.getDescription()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).attachments(attachments).build();
