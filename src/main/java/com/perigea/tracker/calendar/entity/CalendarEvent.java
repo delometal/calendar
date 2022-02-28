@@ -13,11 +13,17 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.perigea.tracker.commons.annotations.NotNull;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @Document
-public abstract class CalendarEvent implements Serializable {
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
+public class CalendarEvent implements Serializable {
 	
 	private static final long serialVersionUID = -2787298694404603816L;
 
