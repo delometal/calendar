@@ -20,6 +20,7 @@ import com.perigea.tracker.commons.enums.EMese;
 import com.perigea.tracker.commons.enums.EmailType;
 import com.perigea.tracker.commons.exception.NullFieldException;
 import com.perigea.tracker.commons.model.Email;
+import com.perigea.tracker.commons.utils.NotNullValidator;
 import com.perigea.tracker.commons.utils.Utils;
 
 @Service
@@ -36,10 +37,10 @@ public class EmailBuilderService {
 		List<String> recipients = new ArrayList<>();
 		Map<String, Object> templateData = new HashMap<>();
 		List<AttachmentDto> attachments = new ArrayList<AttachmentDto>();
-		
-		String f = Utils.validatePojo(event);
-		if ( f != null)
-			throw new NullFieldException(String.format("%s must not be null!", f));
+	
+		// TODO elenco campi null
+		if (!NotNullValidator.validate(event))
+			throw new NullFieldException(String.format("Must not be null!"));
 		
 		for (Contact c : event.getParticipants()) {
 			recipients.add(c.getMailAziendale());
