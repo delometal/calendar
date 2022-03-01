@@ -30,6 +30,7 @@ public class CalendarEvent implements Serializable {
 	@Id
 	private String id;
 	
+	@NotNull
 	@Field
 	private CalendarEventType type;
 	
@@ -47,6 +48,7 @@ public class CalendarEvent implements Serializable {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
 	private Date endDate;
 	
+	@NotNull
 	@Field 
 	private Contact eventCreator;
 	
