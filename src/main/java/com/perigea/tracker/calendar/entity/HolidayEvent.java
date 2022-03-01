@@ -3,6 +3,7 @@ package com.perigea.tracker.calendar.entity;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.perigea.tracker.commons.annotations.NotNull;
 import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 
@@ -18,9 +19,11 @@ public class HolidayEvent extends CalendarEvent {
 	
 	private static final long serialVersionUID = 6657896728352189565L;
 
+	@NotNull
 	@Field
 	private Contact responsabile;
 	
+	@NotNull
 	@Field
 	private ApprovalStatus approved;
 	

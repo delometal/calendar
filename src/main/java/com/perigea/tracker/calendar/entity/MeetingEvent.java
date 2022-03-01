@@ -23,10 +23,11 @@ public class MeetingEvent extends CalendarEvent {
 	private List<Contact> participants;
 	
 	@Field 
-	private boolean meetingRoom;
+	private Boolean meetingRoom;
 	
+	@NotNull
 	@Field 
-	private boolean inPerson;
+	private Boolean inPerson;
 	
 	@NotNull
 	@Field 

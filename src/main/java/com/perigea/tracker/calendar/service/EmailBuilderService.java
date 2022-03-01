@@ -21,7 +21,6 @@ import com.perigea.tracker.commons.enums.EmailType;
 import com.perigea.tracker.commons.exception.NullFieldException;
 import com.perigea.tracker.commons.model.Email;
 import com.perigea.tracker.commons.utils.NotNullValidator;
-import com.perigea.tracker.commons.utils.Utils;
 
 @Service
 public class EmailBuilderService {
@@ -40,7 +39,7 @@ public class EmailBuilderService {
 	
 		// TODO elenco campi null
 		if (!NotNullValidator.validate(event))
-			throw new NullFieldException(String.format("Must not be null!"));
+			throw new NullFieldException(String.format("%s must not be null!", NotNullValidator.getDetails(event)));
 		
 		for (Contact c : event.getParticipants()) {
 			recipients.add(c.getMailAziendale());
@@ -54,7 +53,7 @@ public class EmailBuilderService {
 		templateData.put("dataFine", DATE_FORMAT.format(event.getEndDate()));
 		templateData.put("partecipanti", recipients);
 		templateData.put("azione", azione);
-		templateData.put("presenza", event.isInPerson());
+		templateData.put("presenza", event.getInPerson().booleanValue());
 		
 		return Email.builder().eventID(event.getId()).from(sender).templateName("meetingTemplate.ftlh")
 				.templateModel(templateData).subject(String.format("%s: %s", event.getType(), event.getDescription()))
