@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.perigea.tracker.calendar.entity.TimesheetEvent;
 import com.perigea.tracker.calendar.mapper.TimesheetEventMapper;
-import com.perigea.tracker.calendar.service.EmailBuilderService;
+import com.perigea.tracker.calendar.service.EventEmailBuilderService;
 import com.perigea.tracker.calendar.service.TimesheetEventService;
 import com.perigea.tracker.commons.dto.ResponseDto;
 import com.perigea.tracker.commons.dto.TimesheetEventDto;
@@ -33,7 +33,7 @@ public class TimesheetEventController {
 	private TimesheetEventMapper timesheetMapper;
 
 	@Autowired
-	private EmailBuilderService emailBuilder;
+	private EventEmailBuilderService emailBuilder;
 
 	@Autowired
 	private NotificationRestClient notificator;

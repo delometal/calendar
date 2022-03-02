@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.perigea.tracker.calendar.entity.HolidayEvent;
 import com.perigea.tracker.calendar.mapper.HolidayMapper;
-import com.perigea.tracker.calendar.service.EmailBuilderService;
+import com.perigea.tracker.calendar.service.EventEmailBuilderService;
 import com.perigea.tracker.calendar.service.HolidayEventService;
 import com.perigea.tracker.commons.dto.HolidayEventDto;
 import com.perigea.tracker.commons.dto.ResponseDto;
@@ -36,7 +36,7 @@ public class HolidayEventController {
 	private HolidayMapper holidayMapper;
 
 	@Autowired
-	private EmailBuilderService emailBuilder;
+	private EventEmailBuilderService emailBuilder;
 	
 	@Autowired
 	private NotificationRestClient notificator;

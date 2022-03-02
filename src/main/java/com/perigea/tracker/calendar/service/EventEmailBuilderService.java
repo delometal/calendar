@@ -23,7 +23,7 @@ import com.perigea.tracker.commons.model.Email;
 import com.perigea.tracker.commons.utils.NotNullValidator;
 
 @Service
-public class EmailBuilderService {
+public class EventEmailBuilderService {
 
 	@Value("${spring.mail.username}")
 	private String sender;

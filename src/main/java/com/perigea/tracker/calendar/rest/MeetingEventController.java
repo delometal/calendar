@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.mapper.MeetingMapper;
-import com.perigea.tracker.calendar.service.EmailBuilderService;
+import com.perigea.tracker.calendar.service.EventEmailBuilderService;
 import com.perigea.tracker.calendar.service.MeetingEventService;
 import com.perigea.tracker.calendar.service.MeetingRoomService;
 import com.perigea.tracker.calendar.service.SchedulerService;
@@ -40,7 +40,7 @@ public class MeetingEventController {
 	private SchedulerService schedulerService;
 
 	@Autowired
-	private EmailBuilderService emailBuilder;
+	private EventEmailBuilderService emailBuilder;
 	
 	// TODO notificationService come nome
 	@Autowired
