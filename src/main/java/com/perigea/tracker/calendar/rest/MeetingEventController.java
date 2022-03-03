@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.perigea.tracker.calendar.entity.MeetingEvent;
@@ -63,6 +64,20 @@ public class MeetingEventController {
 		meetingService.save(event);
 		notificator.send(email);
 		schedulerService.scheduleNotifica(notificationDate, emailBuilder.buildReminder(event));
+		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent).code(HttpStatus.OK.value())
+				.description("Meeting inserito nel calendario").build(), HttpStatus.OK);
+	}
+	
+	@PostMapping(path = "/create-periodic-meeting")
+	public ResponseEntity<ResponseDto<MeetingEventDto>> addPeriodicMeeting(@RequestBody MeetingEventDto meetingEvent,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date expiration, @RequestParam String cron) {
+
+		MeetingEvent event = mapper.mapToEntity(meetingEvent);
+		Email email = emailBuilder.build(event, "creato");		
+
+		meetingService.save(event);
+		notificator.send(email);
+		schedulerService.scheduleNotificaPeriodica(cron, emailBuilder.buildReminder(event), expiration);
 		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}

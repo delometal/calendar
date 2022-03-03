@@ -33,6 +33,9 @@ public class ScheduledEvent {
 	@Field
 	private Date nextFireTime;
 	
+	@Field 
+	private Date expiration;
+	
 	@Field
 	private EventStatus status;
 	

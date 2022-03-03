@@ -2,6 +2,8 @@ package com.perigea.tracker.calendar.job;
 
 
 
+import java.util.Date;
+
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -28,10 +30,17 @@ public class NotificationJob implements Job {
 		Email email = (Email)context.getJobDetail().getJobDataMap().get("email");
 		notificationRestClient.send(email);
 		
+		Date expiration = (Date)context.getJobDetail().getJobDataMap().get("expiration");
 		String tipo = (String)context.getJobDetail().getJobDataMap().get("type");
 		if (tipo.equals(Tipo.ISTANTANEA.toString())) {
 			schedulerService.disactiveNotification(email.getEventID());
+		}else {
+			if( expiration != null && new Date().after(expiration) ) {
+				schedulerService.disactiveNotification(email.getEventID());
+			}
 		}
+		
+		
 	}
 
 }
