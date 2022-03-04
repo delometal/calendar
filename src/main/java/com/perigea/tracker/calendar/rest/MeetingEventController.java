@@ -90,7 +90,7 @@ public class MeetingEventController {
 
 		meetingService.update(event);
 		notificator.send(email);
-		schedulerService.reschedule(notificationDate, email.getEventID(), emailBuilder.buildReminder(event));
+		schedulerService.reschedule(notificationDate, email.getEventId(), emailBuilder.buildReminder(event));
 		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent).code(HttpStatus.OK.value())
 				.description("Meeting aggiornato nel calendario").build(), HttpStatus.OK);
 	}

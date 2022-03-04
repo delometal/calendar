@@ -56,7 +56,7 @@ public class EventEmailBuilderService {
 		templateData.put("azione", azione);
 		templateData.put("presenza", event.getInPerson().booleanValue());
 		
-		return Email.builder().eventID(event.getId()).from(sender).templateName(EmailTemplates.MEETING_TEMPLATE.getDescrizione())
+		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.MEETING_TEMPLATE.getDescrizione())
 				.templateModel(templateData).subject(String.format("%s: %s", event.getType(), event.getDescription()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).attachments(attachments).build();
 	}
@@ -78,7 +78,7 @@ public class EventEmailBuilderService {
 		templateData.put("dataInizio", DATE_FORMAT.format(event.getStartDate()));
 		templateData.put("partecipanti", recipients);
 
-		return Email.builder().eventID(event.getId()).from(sender).templateName(EmailTemplates.NOTIFICATION_TEMPLATE.getDescrizione())
+		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.NOTIFICATION_TEMPLATE.getDescrizione())
 				.templateModel(templateData).subject(String.format("REMINDER: %s inizierà a breve", event.getType()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).attachments(attachments).build();
 
@@ -96,7 +96,7 @@ public class EventEmailBuilderService {
 		templateData.put("mese", mese.getDescription());
 		templateData.put("anno", event.getTimesheet().getAnno());
 		
-		return Email.builder().eventID(event.getId()).from(sender).templateName(EmailTemplates.TIMESHEET_TEMPLATE.getDescrizione())
+		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.TIMESHEET_TEMPLATE.getDescrizione())
 				.templateModel(templateData)
 				.subject(String.format("%s %s: %s", event.getEventCreator().getNome(),
 						event.getEventCreator().getCognome(), event.getType()))
@@ -114,7 +114,7 @@ public class EventEmailBuilderService {
 		templateData.put("dataInizio", DATE_FORMAT.format(event.getStartDate()));
 		templateData.put("dataFine", DATE_FORMAT.format(event.getEndDate()));
 
-		return Email.builder().eventID(event.getId()).from(sender).templateName(EmailTemplates.HOLIDAY_TEMPLATE.getDescrizione())
+		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.HOLIDAY_TEMPLATE.getDescrizione())
 				.templateModel(templateData)
 				.subject(String.format("%s %s: %s", event.getEventCreator().getNome(),
 						event.getEventCreator().getCognome(), event.getType()))
@@ -133,7 +133,7 @@ public class EventEmailBuilderService {
 		templateData.put("mese", mese.getDescription());
 		templateData.put("anno", event.getTimesheet().getAnno());
 		
-		return Email.builder().eventID(event.getId()).from(sender).templateName(EmailTemplates.TIMESHEET_TEMPLATE.getDescrizione())
+		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.TIMESHEET_TEMPLATE.getDescrizione())
 				.templateModel(templateData)
 				.subject(String.format("%s %s: %s %s", event.getResponsabile().getNome(),
 						event.getResponsabile().getCognome(), event.getType(),
@@ -152,7 +152,7 @@ public class EventEmailBuilderService {
 		templateData.put("dataInizio", DATE_FORMAT.format(event.getStartDate()));
 		templateData.put("dataFine", DATE_FORMAT.format(event.getEndDate()));
 
-		return Email.builder().eventID(event.getId()).from(sender).templateName(EmailTemplates.HOLIDAY_TEMPLATE.getDescrizione())
+		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.HOLIDAY_TEMPLATE.getDescrizione())
 				.templateModel(templateData)
 				.subject(String.format("%s %s: %s %s", event.getResponsabile().getNome(),
 						event.getResponsabile().getCognome(), event.getType(),
