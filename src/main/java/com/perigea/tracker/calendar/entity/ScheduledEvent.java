@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Document (collection = "scheduled_event")
 public class ScheduledEvent {
 	
-	public enum Tipo {PERIODICO, ISTANTANEA}
+	
 	
 	@Field
 	@Id

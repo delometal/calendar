@@ -48,8 +48,7 @@ public class MeetingEventController {
 
 	@Autowired
 	private EventEmailBuilderService emailBuilder;
-
-	// TODO notificationService come nome
+	
 	@Autowired
 	private NotificationRestClient notificator;
 
@@ -63,8 +62,8 @@ public class MeetingEventController {
 	public ResponseEntity<ResponseDto<MeetingEventDto>> addMeeting(@RequestBody MeetingEventDto meetingEvent) {
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
-		Email email = emailBuilder.build(event, "creato");
-		Date notificationDate = Utils.shiftTime(event.getStartDate(), Utils.NOTIFICATION_SHIFT_AMOUNT);
+		Email email = emailBuilder.build(event, "creato");		
+		Date notificationDate = Utils.shiftTime(event.getStartDate(), event.getReminederTime().getMinuti());
 
 		meetingService.save(event);
 //		notificator.send(email);
