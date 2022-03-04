@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,11 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.mapper.MeetingMapper;
+import com.perigea.tracker.calendar.repository.MeetingEventRepository;
 import com.perigea.tracker.calendar.service.EventEmailBuilderService;
 import com.perigea.tracker.calendar.service.MeetingEventService;
 import com.perigea.tracker.calendar.service.MeetingRoomService;
 import com.perigea.tracker.calendar.service.SchedulerService;
 import com.perigea.tracker.commons.dto.MeetingEventDto;
+import com.perigea.tracker.commons.dto.MeetingEventReserved;
 import com.perigea.tracker.commons.dto.ResponseDto;
 import com.perigea.tracker.commons.model.Email;
 import com.perigea.tracker.commons.utils.Utils;
@@ -35,53 +38,55 @@ import com.perigea.tracker.commons.utils.Utils;
 public class MeetingEventController {
 
 	@Autowired
+	private MeetingEventRepository meetingEventRepository;
+
+	@Autowired
 	private MeetingEventService meetingService;
-	
+
 	@Autowired
 	private SchedulerService schedulerService;
 
 	@Autowired
 	private EventEmailBuilderService emailBuilder;
-	
+
 	// TODO notificationService come nome
 	@Autowired
 	private NotificationRestClient notificator;
-	
+
 	@Autowired
 	private MeetingRoomService roomService;
-	
+
 	@Autowired
 	private MeetingMapper mapper;
-
 
 	@PostMapping(path = "/create-meeting")
 	public ResponseEntity<ResponseDto<MeetingEventDto>> addMeeting(@RequestBody MeetingEventDto meetingEvent) {
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
-		Email email = emailBuilder.build(event, "creato");		
+		Email email = emailBuilder.build(event, "creato");
 		Date notificationDate = Utils.shiftTime(event.getStartDate(), Utils.NOTIFICATION_SHIFT_AMOUNT);
 
 		meetingService.save(event);
-		notificator.send(email);
-		schedulerService.scheduleNotifica(notificationDate, emailBuilder.buildReminder(event));
-		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent).code(HttpStatus.OK.value())
-				.description("Meeting inserito nel calendario").build(), HttpStatus.OK);
+//		notificator.send(email);
+//		schedulerService.scheduleNotifica(notificationDate, emailBuilder.buildReminder(event));
+		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent)
+				.code(HttpStatus.OK.value()).description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}
-	
+
 	@PostMapping(path = "/create-periodic-meeting")
 	public ResponseEntity<ResponseDto<MeetingEventDto>> addPeriodicMeeting(@RequestBody MeetingEventDto meetingEvent,
 			@RequestParam @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date expiration, @RequestParam String cron) {
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
-		Email email = emailBuilder.build(event, "creato");		
+		Email email = emailBuilder.build(event, "creato");
 
 		meetingService.save(event);
 		notificator.send(email);
 		schedulerService.scheduleNotificaPeriodica(cron, emailBuilder.buildReminder(event), expiration);
-		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent).code(HttpStatus.OK.value())
-				.description("Meeting inserito nel calendario").build(), HttpStatus.OK);
+		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent)
+				.code(HttpStatus.OK.value()).description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}
-	
+
 	@PutMapping(path = "/update-meeting")
 	public ResponseEntity<ResponseDto<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent) {
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
@@ -91,25 +96,22 @@ public class MeetingEventController {
 		meetingService.update(event);
 		notificator.send(email);
 		schedulerService.reschedule(notificationDate, email.getEventId(), emailBuilder.buildReminder(event));
-		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent).code(HttpStatus.OK.value())
-				.description("Meeting aggiornato nel calendario").build(), HttpStatus.OK);
+		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent)
+				.code(HttpStatus.OK.value()).description("Meeting aggiornato nel calendario").build(), HttpStatus.OK);
 	}
 
 	@DeleteMapping(path = "/delete-meeting")
-	public ResponseEntity<ResponseDto<String>> deleteMeeting(@RequestBody MeetingEventDto toBeDeleted, @RequestBody List<String> filePath) {
+	public ResponseEntity<ResponseDto<String>> deleteMeeting(@RequestBody MeetingEventDto toBeDeleted,
+			@RequestBody List<String> filePath) {
 		MeetingEvent event = mapper.mapToEntity(toBeDeleted);
 		meetingService.delete(event);
 		Email email = emailBuilder.build(event, "eliminato");
 		notificator.send(email);
 		boolean deleted = schedulerService.disactiveNotification(toBeDeleted.getId());
-		return new ResponseEntity<>(
-				ResponseDto.<String>builder().data(deleted ? "OK" : "Error")
-						.code(deleted ? HttpStatus.OK.value() : HttpStatus.BAD_REQUEST.value())
-						.build(),
-				HttpStatus.OK);
+		return new ResponseEntity<>(ResponseDto.<String>builder().data(deleted ? "OK" : "Error")
+				.code(deleted ? HttpStatus.OK.value() : HttpStatus.BAD_REQUEST.value()).build(), HttpStatus.OK);
 	}
 
-	
 	@GetMapping(path = "/get-by-creator/{mailCreator}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllByCreator(@PathVariable String mailCreator) {
 		// finestra di tempo simmetrica di due mesi
@@ -136,15 +138,15 @@ public class MeetingEventController {
 	@GetMapping(path = "/all-by-range-and-creator/{from}/{to}/{mailCreator}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRangeByCreator(
 			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to,
-			@PathVariable String mailCreator) {
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to, @PathVariable String mailCreator) {
 
 		List<MeetingEvent> events = meetingService.getEventsBetweenByCreator(from, to, mailCreator);
 		List<MeetingEventDto> meetings = mapper.mapToDtoList(events);
-		return new ResponseEntity<ResponseDto<List<MeetingEventDto>>>(ResponseDto.<List<MeetingEventDto>>builder()
-				.data(meetings)
-				.description(String.format("Tutti i meeting di %s tra il %s e il %s", mailCreator, from, to))
-				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
+		return new ResponseEntity<ResponseDto<List<MeetingEventDto>>>(
+				ResponseDto.<List<MeetingEventDto>>builder().data(meetings)
+						.description(String.format("Tutti i meeting di %s tra il %s e il %s", mailCreator, from, to))
+						.code(HttpStatus.OK.value()).build(),
+				HttpStatus.OK);
 	}
 
 	@GetMapping(path = "/room-availability-in-range/{from}/{to}")
@@ -163,6 +165,22 @@ public class MeetingEventController {
 		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(instant))
 				.description(String.format("Disponibiltà sala riunioni in data %s", instant.toString()))
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
+	}
+
+	@GetMapping(path = "/all-meetings-reserved/{startDate}/{endDate}")
+	public ResponseEntity<ResponseDto<List<MeetingEventReserved>>> getAllMeetingsReserved(
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date startDate,
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date endDate) {
+
+		List<MeetingEvent> meetingsEvents = meetingEventRepository.blockingMeetingsInRange(startDate, endDate);
+		List<MeetingEventReserved> meetingsReserved = meetingsEvents.stream()
+				.map(k -> MeetingEventReserved.builder().startDate(k.getStartDate()).endDate(k.getEndDate()).build())
+				.collect(Collectors.toList());
+
+		return new ResponseEntity<>(
+				ResponseDto.<List<MeetingEventReserved>>builder().data(meetingsReserved)
+						.description("Lista date sala riunioni occupata").code(HttpStatus.OK.value()).build(),
+				HttpStatus.OK);
 	}
 
 }

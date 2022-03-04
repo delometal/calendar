@@ -10,6 +10,7 @@ import com.perigea.tracker.commons.enums.ResponseType;
 import com.perigea.tracker.commons.exception.EntityNotFoundException;
 import com.perigea.tracker.commons.exception.HolidayEventException;
 import com.perigea.tracker.commons.exception.MeetingEventException;
+import com.perigea.tracker.commons.exception.MeetingRoomReservedException;
 import com.perigea.tracker.commons.exception.NotificationSchedulerException;
 import com.perigea.tracker.commons.exception.NullFieldException;
 import com.perigea.tracker.commons.exception.ParticipantException;
@@ -93,6 +94,17 @@ public class ExceptionHandlerController {
 				.code(HttpStatus.INTERNAL_SERVER_ERROR.value())
 				.description(ex.getMessage())
 				.build(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@ExceptionHandler(MeetingRoomReservedException.class)
+	public final ResponseEntity<ResponseDto<String>> handleMeetingEventReservedException(MeetingRoomReservedException ex){
+		return new ResponseEntity<>(
+				ResponseDto.<String>builder()
+				.data(null)
+				.type(ResponseType.ERROR)
+				.code(HttpStatus.BAD_REQUEST.value())
+				.description(ex.getMessage())
+				.build(), HttpStatus.BAD_REQUEST);
 	}
 
 }

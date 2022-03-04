@@ -15,6 +15,8 @@ import com.perigea.tracker.calendar.repository.MeetingEventRepository;
 import com.perigea.tracker.commons.enums.ParticipationStatus;
 import com.perigea.tracker.commons.exception.EntityNotFoundException;
 import com.perigea.tracker.commons.exception.MeetingEventException;
+import com.perigea.tracker.commons.exception.MeetingRoomReservedException;
+import com.perigea.tracker.commons.utils.Utils;
 
 @Service
 public class MeetingEventService {
@@ -26,6 +28,9 @@ public class MeetingEventService {
 	private Logger logger;
 
 	public void save(MeetingEvent event) {
+		if(isReserved(event)) {
+			throw new MeetingRoomReservedException("Stanza nel periodo indicato non disponibile!");
+		}
 		repository.save(event);
 		logger.info(String.format("Evento %s aggiunto in persistenza", event.getId()));
 
@@ -126,5 +131,21 @@ public class MeetingEventService {
 		repository.save(event);
 		logger.info(String.format("Evento %s aggiornato", event.getId()));
 		return true;
+	}
+	
+
+	private boolean isReserved(MeetingEvent event) {
+		
+		Date startDate = Utils.shiftTime(event.getStartDate(), -1);
+		Date endDate = Utils.shiftTime(event.getEndDate(), +1);;
+		
+		
+		List<MeetingEvent> alreadyReserved = repository.blockingMeetingsInRange(startDate, endDate);
+		
+		if(alreadyReserved.isEmpty()) {
+			return false;
+		}else {
+			return true;
+		}
 	}
 }
