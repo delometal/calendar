@@ -90,7 +90,7 @@ public class MeetingEventController {
 	public ResponseEntity<ResponseDto<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent) {
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		Email email = emailBuilder.build(event, "modificato");
-		Date notificationDate = Utils.shiftTime(event.getStartDate(), Utils.NOTIFICATION_SHIFT_AMOUNT);
+		Date notificationDate = Utils.shiftTime(event.getStartDate(), event.getReminederTime().getMinuti());
 
 		meetingService.update(event);
 		notificator.send(email);
