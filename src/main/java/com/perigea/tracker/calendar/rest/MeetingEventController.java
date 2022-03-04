@@ -43,7 +43,6 @@ public class MeetingEventController {
 	@Autowired
 	private EventEmailBuilderService emailBuilder;
 	
-	// TODO notificationService come nome
 	@Autowired
 	private NotificationRestClient notificator;
 	

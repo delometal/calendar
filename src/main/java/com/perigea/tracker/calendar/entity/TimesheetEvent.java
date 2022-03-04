@@ -1,7 +1,5 @@
 package com.perigea.tracker.calendar.entity;
 
-import java.util.List;
-
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 

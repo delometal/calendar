@@ -37,7 +37,6 @@ public class EventEmailBuilderService {
 		Map<String, Object> templateData = new HashMap<>();
 		List<AttachmentDto> attachments = new ArrayList<AttachmentDto>();
 	
-		// TODO elenco campi null
 		if (!NotNullValidator.validate(event))
 			throw new NullFieldException(String.format("%s must not be null!", NotNullValidator.getDetails(event)));
 		
