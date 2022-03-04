@@ -53,9 +53,9 @@ public class SchedulerRestController {
 	}
 
 	@GetMapping(path = "delete/{id}")
-	public ResponseEntity<String> delete(@PathVariable String id) throws SchedulerException {
-
-		return new ResponseEntity<>(service.disactiveNotification(id) ? "Deleted" : "Not found", HttpStatus.OK);
+	public ResponseEntity<String> delete(@PathVariable String id) throws SchedulerException{
+		boolean isDisactivated = service.disactiveNotification(id);
+		return new ResponseEntity<>(isDisactivated ? "Deleted" : "Not found", isDisactivated ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 //	@GetMapping(path = "reschedule", params = {"id", "data"})

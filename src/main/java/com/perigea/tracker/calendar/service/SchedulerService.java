@@ -191,7 +191,7 @@ public class SchedulerService {
 		JobDataMap dataMap = new JobDataMap();
 		dataMap.put("email", email);
 		dataMap.put("type", type);
-		return JobBuilder.newJob(NotificationJob.class).withIdentity(email.getEventID(), "calendar")
+		return JobBuilder.newJob(NotificationJob.class).withIdentity(email.getEventId(), "calendar")
 				.usingJobData(dataMap).withDescription("Job scheduler for notification").build();
 	}
 
@@ -200,7 +200,7 @@ public class SchedulerService {
 		dataMap.put("email", email);
 		dataMap.put("type", type);
 		dataMap.put("expiration", expiration);
-		return JobBuilder.newJob(NotificationJob.class).withIdentity(email.getEventID(), "calendar")
+		return JobBuilder.newJob(NotificationJob.class).withIdentity(email.getEventId(), "calendar")
 				.usingJobData(dataMap).withDescription("Job scheduler for notification").build();
 	}
 
