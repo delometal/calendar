@@ -59,7 +59,7 @@ public class MeetingEventController {
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		Email email = emailBuilder.build(event, "creato");		
-		Date notificationDate = Utils.shiftTime(event.getStartDate(), Utils.NOTIFICATION_SHIFT_AMOUNT);
+		Date notificationDate = Utils.shiftTime(event.getStartDate(), event.getReminederTime().getMinuti());
 
 		meetingService.save(event);
 		notificator.send(email);

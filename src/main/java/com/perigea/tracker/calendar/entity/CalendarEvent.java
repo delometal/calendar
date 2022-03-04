@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.perigea.tracker.commons.annotations.NotNull;
 import com.perigea.tracker.commons.enums.CalendarEventType;
+import com.perigea.tracker.commons.enums.ReminderEventTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,5 +52,8 @@ public class CalendarEvent implements Serializable {
 	@NotNull
 	@Field 
 	private Contact eventCreator;
+	
+	@Field
+	private ReminderEventTime reminederTime;
 	
 }

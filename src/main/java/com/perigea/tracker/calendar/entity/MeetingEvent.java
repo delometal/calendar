@@ -11,12 +11,11 @@ import com.perigea.tracker.commons.enums.CalendarEventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
-@Document (collection = "event_meeting")
-@EqualsAndHashCode(callSuper=false)
+@Document(collection = "event_meeting")
+@EqualsAndHashCode(callSuper = false)
 @SuperBuilder
 @AllArgsConstructor
 public class MeetingEvent extends CalendarEvent {
@@ -26,21 +25,21 @@ public class MeetingEvent extends CalendarEvent {
 	@NotNull
 	@Field
 	private List<Contact> participants;
-	
-	@Field 
+
+	@Field
 	private Boolean meetingRoom;
-	
+
 	@NotNull
-	@Field 
+	@Field
 	private Boolean inPerson;
-	
+
 	@NotNull
-	@Field 
+	@Field
 	private String description;
-	
-	@Field 
+
+	@Field
 	private String link;
-	
+
 	public MeetingEvent() {
 		this.setType(CalendarEventType.Riunione);
 	}
