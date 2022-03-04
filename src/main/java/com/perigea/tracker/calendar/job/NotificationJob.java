@@ -10,9 +10,9 @@ import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.perigea.tracker.calendar.entity.ScheduledEvent.Tipo;
 import com.perigea.tracker.calendar.rest.NotificationRestClient;
 import com.perigea.tracker.calendar.service.SchedulerService;
+import com.perigea.tracker.commons.enums.TipoScheduleEvent;
 import com.perigea.tracker.commons.model.Email;
 
 @Component
@@ -32,7 +32,7 @@ public class NotificationJob implements Job {
 		
 		Date expiration = (Date)context.getJobDetail().getJobDataMap().get("expiration");
 		String tipo = (String)context.getJobDetail().getJobDataMap().get("type");
-		if (tipo.equals(Tipo.ISTANTANEA.toString())) {
+		if (tipo.equals(TipoScheduleEvent.ISTANTANEA.toString())) {
 			schedulerService.disactiveNotification(email.getEventID());
 		}else {
 			if( expiration != null && new Date().after(expiration) ) {

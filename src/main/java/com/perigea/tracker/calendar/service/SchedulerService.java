@@ -18,12 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.perigea.tracker.calendar.entity.ScheduledEvent;
-import com.perigea.tracker.calendar.entity.ScheduledEvent.Tipo;
 import com.perigea.tracker.calendar.job.NotificationJob;
 import com.perigea.tracker.commons.enums.EventStatus;
+import com.perigea.tracker.commons.enums.TipoScheduleEvent;
 import com.perigea.tracker.commons.exception.NotificationSchedulerException;
 import com.perigea.tracker.commons.model.Email;
-
 
 @Service
 public class SchedulerService {
@@ -38,7 +37,7 @@ public class SchedulerService {
 	private ScheduledEventRepositoryService repositoryService;
 
 	public ScheduledEvent scheduleNotifica(Date dataEsecuzione, Email email) {
-		JobDetail detail = buildJobDetail(email, Tipo.ISTANTANEA.toString());
+		JobDetail detail = buildJobDetail(email, TipoScheduleEvent.ISTANTANEA.toString());
 		Trigger trigger = buildJobTrigger(detail, dataEsecuzione);
 		try {
 			Date nextFire = scheduler.scheduleJob(detail, trigger);
@@ -48,13 +47,14 @@ public class SchedulerService {
 		}
 
 		ScheduledEvent info = ScheduledEvent.builder().email(email).id(detail.getKey().getName())
-				.nextFireTime(dataEsecuzione).tipo(Tipo.ISTANTANEA.name()).status(EventStatus.Active).build();
+				.nextFireTime(dataEsecuzione).tipo(TipoScheduleEvent.ISTANTANEA.name()).status(EventStatus.Active)
+				.build();
 		repositoryService.save(info);
 		return info;
 	}
 
 	public ScheduledEvent scheduleNotificaPeriodica(String cron, Email email, Date expiration) {
-		JobDetail detail = buildJobDetailPeriodic(email, Tipo.PERIODICO.toString(), expiration);
+		JobDetail detail = buildJobDetailPeriodic(email, TipoScheduleEvent.PERIODICO.toString(), expiration);
 		Trigger trigger = buildCronJobTrigger(detail, cron);
 		try {
 			Date nextFire = scheduler.scheduleJob(detail, trigger);
@@ -64,9 +64,8 @@ public class SchedulerService {
 		}
 
 		ScheduledEvent info = ScheduledEvent.builder().email(email).id(detail.getKey().getName())
-				.nextFireTime(trigger.getNextFireTime()).cron(cron).tipo(Tipo.PERIODICO.name())
-				.expiration(expiration)
-				.status(EventStatus.Active).build();
+				.nextFireTime(trigger.getNextFireTime()).cron(cron).tipo(TipoScheduleEvent.PERIODICO.name())
+				.expiration(expiration).status(EventStatus.Active).build();
 		repositoryService.save(info);
 		return info;
 	}
@@ -115,7 +114,7 @@ public class SchedulerService {
 	}
 
 	public ScheduledEvent reschedule(Date nuovaData, String id, Email email) {
-		
+
 		JobDetail detail = buildJobDetail(email, repositoryService.getById(id).getTipo());
 		JobKey jobKey = new JobKey(id, "calendar");
 		try {
@@ -127,7 +126,8 @@ public class SchedulerService {
 			scheduler.rescheduleJob(triggerKey, trigger);
 			logger.info(String.format("Notifica rischedulata in data %s", nuovaData));
 			ScheduledEvent info = ScheduledEvent.builder().email(email).id(detail.getKey().getName())
-					.nextFireTime(nuovaData).tipo(Tipo.ISTANTANEA.name()).status(EventStatus.Active).build();
+					.nextFireTime(nuovaData).tipo(TipoScheduleEvent.ISTANTANEA.name()).status(EventStatus.Active)
+					.build();
 			repositoryService.save(info);
 			return info;
 		} catch (Exception e) {
@@ -149,8 +149,8 @@ public class SchedulerService {
 			}
 
 			ScheduledEvent info = ScheduledEvent.builder().email((Email) detail.getJobDataMap().get("email"))
-					.id(detail.getKey().getName()).cron(cron).tipo(Tipo.PERIODICO.name()).status(EventStatus.Active)
-					.build();
+					.id(detail.getKey().getName()).cron(cron).tipo(TipoScheduleEvent.PERIODICO.name())
+					.status(EventStatus.Active).build();
 			repositoryService.save(info);
 			return info;
 		} catch (Exception e) {
@@ -166,7 +166,7 @@ public class SchedulerService {
 				JobDetail detail = buildJobDetail(scheduledInfo.getEmail(), scheduledInfo.getTipo());
 				Trigger trigger;
 
-				if (scheduledInfo.getTipo().equals(Tipo.PERIODICO.name())) {
+				if (scheduledInfo.getTipo().equals(TipoScheduleEvent.PERIODICO.name())) {
 					trigger = buildCronJobTrigger(detail, scheduledInfo.getCron());
 				} else {
 					trigger = buildJobTrigger(detail, scheduledInfo.getNextFireTime());
@@ -194,7 +194,7 @@ public class SchedulerService {
 		return JobBuilder.newJob(NotificationJob.class).withIdentity(email.getEventID(), "calendar")
 				.usingJobData(dataMap).withDescription("Job scheduler for notification").build();
 	}
-	
+
 	private JobDetail buildJobDetailPeriodic(Email email, String type, Date expiration) {
 		JobDataMap dataMap = new JobDataMap();
 		dataMap.put("email", email);
