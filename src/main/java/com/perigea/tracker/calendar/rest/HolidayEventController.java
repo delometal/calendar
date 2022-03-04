@@ -24,6 +24,7 @@ import com.perigea.tracker.commons.dto.HolidayEventDto;
 import com.perigea.tracker.commons.dto.ResponseDto;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 import com.perigea.tracker.commons.model.Email;
+import com.perigea.tracker.commons.utils.Utils;
 
 @RestController
 @RequestMapping(path = "/holiday")
@@ -87,8 +88,8 @@ public class HolidayEventController {
 	
 	@GetMapping(path = "/get-by-date-creator-type/{mailAziendaleCeator}/{from}/{to}/{type}")
 	public ResponseEntity<ResponseDto<List<HolidayEventDto>>> findAllByCreatorBetweenDates(
-			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
-			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to,
 			@PathVariable String mailAziendaleCeator, @PathVariable CalendarEventType type) {
 		List<HolidayEvent> events = holidayEventService.findAllByDateCreatorType(from, to, mailAziendaleCeator, type);
 		List<HolidayEventDto> leaves = holidayMapper.mapToDtoList(events);
@@ -99,8 +100,8 @@ public class HolidayEventController {
 
 	@GetMapping(path = "/get-by-date-responsabile-type/{mailAziendaleResponsabile}/{from}/{to}/{type}")
 	public ResponseEntity<ResponseDto<List<HolidayEventDto>>> findAllByResponsabileBewtweenDates(
-			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
-			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to,
 			@PathVariable String mailAziendaleResponsabile, @PathVariable CalendarEventType type) {
 		List<HolidayEvent> events = holidayEventService.findAllByDateResponsabileType(from, to, mailAziendaleResponsabile, type);
 		List<HolidayEventDto> leaves = holidayMapper.mapToDtoList(events);

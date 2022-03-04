@@ -70,7 +70,7 @@ public class MeetingEventController {
 	
 	@PostMapping(path = "/create-periodic-meeting")
 	public ResponseEntity<ResponseDto<MeetingEventDto>> addPeriodicMeeting(@RequestBody MeetingEventDto meetingEvent,
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date expiration, @RequestParam String cron) {
+			@RequestParam @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date expiration, @RequestParam String cron) {
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		Email email = emailBuilder.build(event, "creato");		
@@ -123,8 +123,8 @@ public class MeetingEventController {
 
 	@GetMapping(path = "/get-meetings-in-date-range/{from}/{to}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRange(
-			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
-			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to) {
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to) {
 
 		List<MeetingEvent> events = meetingService.getEventsBetween(from, to);
 		List<MeetingEventDto> meetings = mapper.mapToDtoList(events);
@@ -135,8 +135,8 @@ public class MeetingEventController {
 
 	@GetMapping(path = "/all-by-range-and-creator/{from}/{to}/{mailCreator}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRangeByCreator(
-			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
-			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to,
 			@PathVariable String mailCreator) {
 
 		List<MeetingEvent> events = meetingService.getEventsBetweenByCreator(from, to, mailCreator);
@@ -149,8 +149,8 @@ public class MeetingEventController {
 
 	@GetMapping(path = "/room-availability-in-range/{from}/{to}")
 	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(
-			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
-			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to) {
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to) {
 		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(from, to))
 				.description(String.format("Disponibiltà sala riunioni da %s a %s", from.toString(), to.toString()))
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
@@ -158,7 +158,7 @@ public class MeetingEventController {
 
 	@GetMapping(path = "/room-availability/{instant}")
 	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(
-			@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date instant) {
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date instant) {
 
 		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(instant))
 				.description(String.format("Disponibiltà sala riunioni in data %s", instant.toString()))
