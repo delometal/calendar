@@ -32,7 +32,7 @@ public class NotificationJob implements Job {
 		
 		Date expiration = (Date)context.getJobDetail().getJobDataMap().get("expiration");
 		String tipo = (String)context.getJobDetail().getJobDataMap().get("type");
-		if (tipo.equals(Tipo.ISTANTANEA.toString())) {
+		if (tipo.equals(TipoScheduleEvent.ISTANTANEA.toString())) {
 			schedulerService.disactiveNotification(email.getEventId());
 		}else {
 			if( expiration != null && new Date().after(expiration) ) {
