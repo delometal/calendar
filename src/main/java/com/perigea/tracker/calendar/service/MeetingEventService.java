@@ -137,15 +137,11 @@ public class MeetingEventService {
 	private boolean isReserved(MeetingEvent event) {
 		
 		Date startDate = Utils.shiftTime(event.getStartDate(), -1);
-		Date endDate = Utils.shiftTime(event.getEndDate(), +1);;
-		
+		Date endDate = Utils.shiftTime(event.getEndDate(), +1);
 		
 		List<MeetingEvent> alreadyReserved = repository.blockingMeetingsInRange(startDate, endDate);
 		
-		if(alreadyReserved.isEmpty()) {
-			return false;
-		}else {
-			return true;
-		}
+		return !alreadyReserved.isEmpty();
+		
 	}
 }

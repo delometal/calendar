@@ -66,6 +66,7 @@ public class MeetingEventController {
 		Date notificationDate = Utils.shiftTime(event.getStartDate(), event.getReminederTime().getMinuti());
 
 		meetingService.save(event);
+		//FIXME Da scommentare per utilizzo
 //		notificator.send(email);
 //		schedulerService.scheduleNotifica(notificationDate, emailBuilder.buildReminder(event));
 		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent)
@@ -166,8 +167,8 @@ public class MeetingEventController {
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
 	}
 
-	@GetMapping(path = "/all-meetings-reserved/{startDate}/{endDate}")
-	public ResponseEntity<ResponseDto<List<MeetingEventReserved>>> getAllMeetingsReserved(
+	@GetMapping(path = "/all-dates-meetings-reserved/{startDate}/{endDate}")
+	public ResponseEntity<ResponseDto<List<MeetingEventReserved>>> getAllDatesMeetingsReserved(
 			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date startDate,
 			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date endDate) {
 
@@ -178,6 +179,19 @@ public class MeetingEventController {
 
 		return new ResponseEntity<>(
 				ResponseDto.<List<MeetingEventReserved>>builder().data(meetingsReserved)
+						.description("Lista date sala riunioni occupata").code(HttpStatus.OK.value()).build(),
+				HttpStatus.OK);
+	}
+	
+	@GetMapping(path = "/all-meetings-reserved/{startDate}/{endDate}")
+	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllMeetingsReserved(
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date startDate,
+			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date endDate) {
+
+		List<MeetingEvent> meetingsEvents = meetingEventRepository.blockingMeetingsInRange(startDate, endDate);
+		
+		return new ResponseEntity<>(
+				ResponseDto.<List<MeetingEventDto>>builder().data(mapper.mapToDtoList(meetingsEvents))
 						.description("Lista date sala riunioni occupata").code(HttpStatus.OK.value()).build(),
 				HttpStatus.OK);
 	}
