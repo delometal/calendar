@@ -75,7 +75,7 @@ public class HolidayEventController {
 				HttpStatus.OK);
 	}
 	
-	@PutMapping(path = "/approve")
+	@PostMapping(path = "/approve")
 	public ResponseEntity<ResponseDto<HolidayEventDto>> approveEvent(@RequestBody HolidayEventDto holidayEvent) {
 		HolidayEvent toBeApproved = holidayMapper.mapToEntity(holidayEvent);
 		holidayEventService.update(toBeApproved);
