@@ -166,7 +166,7 @@ public class EventEmailBuilderService {
 		templateData.put("azione", event.getApproved().toString().toLowerCase());
 		templateData.put("events", list);
 
-		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.APPROVAL_HOLIDAYS.getDescrizione())
+		return Email.builder().eventId(event.getId()).from(properties.getEmailSender()).templateName(EmailTemplates.APPROVAL_HOLIDAYS.getDescrizione())
 				.templateModel(templateData)
 				.subject(String.format("%s %s: %s %s", event.getResponsabile().getNome(),
 						event.getResponsabile().getCognome(), event.getType(),
