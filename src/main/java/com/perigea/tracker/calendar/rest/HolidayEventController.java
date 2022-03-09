@@ -1,10 +1,8 @@
 package com.perigea.tracker.calendar.rest;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,9 +20,7 @@ import com.perigea.tracker.calendar.service.EventEmailBuilderService;
 import com.perigea.tracker.calendar.service.HolidayEventService;
 import com.perigea.tracker.commons.dto.HolidayEventRequestDto;
 import com.perigea.tracker.commons.dto.ResponseDto;
-import com.perigea.tracker.commons.enums.CalendarEventType;
 import com.perigea.tracker.commons.model.Email;
-import com.perigea.tracker.commons.utils.Utils;
 
 @RestController
 @RequestMapping(path = "/holiday")
