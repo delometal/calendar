@@ -107,10 +107,9 @@ public class EventEmailBuilderService {
 		recipient.add(event.getResponsabile().getMailAziendale());
 		Map<String, Object> templateData = new HashMap<>();
 		templateData.put("utente", event.getEventCreator().getMailAziendale());
-		templateData.put("eventType", event.getType());
 		templateData.put("azione", azione);
-//		templateData.put("dataInizio", Utils.DATE_FORMATTER.format(event.getStartDate()));
-//		templateData.put("dataFine", Utils.DATE_FORMATTER.format(event.getEndDate()));
+		templateData.put("events", event.getHolidays());
+		
 
 		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.HOLIDAY_TEMPLATE.getDescrizione())
 				.templateModel(templateData)

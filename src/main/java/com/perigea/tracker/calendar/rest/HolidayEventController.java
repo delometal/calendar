@@ -86,29 +86,29 @@ public class HolidayEventController {
 				HttpStatus.OK);
 	}
 	
-	@GetMapping(path = "/get-by-date-creator-type/{mailAziendaleCeator}/{from}/{to}/{type}")
-	public ResponseEntity<ResponseDto<List<HolidayEventRequestDto>>> findAllByCreatorBetweenDates(
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to,
-			@PathVariable String mailAziendaleCeator, @PathVariable CalendarEventType type) {
-		List<HolidayRequestEvent> events = holidayEventService.findAllByDateCreatorType(from, to, mailAziendaleCeator, type);
-		List<HolidayEventRequestDto> leaves = holidayMapper.mapToDtoList(events);
-		return new ResponseEntity<>(ResponseDto.<List<HolidayEventRequestDto>>builder().data(leaves).code(HttpStatus.OK.value())
-				.description(String.format("Lista dei permessi %s di %s dal %s al %s",type, mailAziendaleCeator, from, to)).build(),
-				HttpStatus.OK);
-	}
-
-	@GetMapping(path = "/get-by-date-responsabile-type/{mailAziendaleResponsabile}/{from}/{to}/{type}")
-	public ResponseEntity<ResponseDto<List<HolidayEventRequestDto>>> findAllByResponsabileBewtweenDates(
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to,
-			@PathVariable String mailAziendaleResponsabile, @PathVariable CalendarEventType type) {
-		List<HolidayRequestEvent> events = holidayEventService.findAllByDateResponsabileType(from, to, mailAziendaleResponsabile, type);
-		List<HolidayEventRequestDto> leaves = holidayMapper.mapToDtoList(events);
-		return new ResponseEntity<>(ResponseDto.<List<HolidayEventRequestDto>>builder().data(leaves).code(HttpStatus.OK.value())
-				.description(String.format("Lista dei permessi %s di %s dal %s al %s",type, mailAziendaleResponsabile, from, to))
-				.build(), HttpStatus.OK);
-	}
+//	@GetMapping(path = "/get-by-date-creator-type/{mailAziendaleCeator}/{from}/{to}/{type}")
+//	public ResponseEntity<ResponseDto<List<HolidayEventRequestDto>>> findAllByCreatorBetweenDates(
+//			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
+//			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to,
+//			@PathVariable String mailAziendaleCeator, @PathVariable CalendarEventType type) {
+//		List<HolidayRequestEvent> events = holidayEventService.findAllByDateCreatorType(from, to, mailAziendaleCeator, type);
+//		List<HolidayEventRequestDto> leaves = holidayMapper.mapToDtoList(events);
+//		return new ResponseEntity<>(ResponseDto.<List<HolidayEventRequestDto>>builder().data(leaves).code(HttpStatus.OK.value())
+//				.description(String.format("Lista dei permessi %s di %s dal %s al %s",type, mailAziendaleCeator, from, to)).build(),
+//				HttpStatus.OK);
+//	}
+//
+//	@GetMapping(path = "/get-by-date-responsabile-type/{mailAziendaleResponsabile}/{from}/{to}/{type}")
+//	public ResponseEntity<ResponseDto<List<HolidayEventRequestDto>>> findAllByResponsabileBewtweenDates(
+//			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
+//			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to,
+//			@PathVariable String mailAziendaleResponsabile, @PathVariable CalendarEventType type) {
+//		List<HolidayRequestEvent> events = holidayEventService.findAllByDateResponsabileType(from, to, mailAziendaleResponsabile, type);
+//		List<HolidayEventRequestDto> leaves = holidayMapper.mapToDtoList(events);
+//		return new ResponseEntity<>(ResponseDto.<List<HolidayEventRequestDto>>builder().data(leaves).code(HttpStatus.OK.value())
+//				.description(String.format("Lista dei permessi %s di %s dal %s al %s",type, mailAziendaleResponsabile, from, to))
+//				.build(), HttpStatus.OK);
+//	}
 
 	@GetMapping(path = "/get-by-event-creator/{mailAziendaleCreator}")
 	public ResponseEntity<ResponseDto<List<HolidayEventRequestDto>>> findAllByCreator(@PathVariable String mailAziendaleCreator) {

@@ -45,13 +45,13 @@ public class HolidayEventService {
 		repository.save(event);
 	}
 
-	public List<HolidayRequestEvent> getEventsBetween(Date from, Date to) {
-		try {
-			return repository.findAllByStartDateBetween(from, to);
-		} catch (Exception ex) {
-			throw new HolidayEventException(ex.getMessage());
-		}
-	}
+//	public List<HolidayRequestEvent> getEventsBetween(Date from, Date to) {
+//		try {
+//			return repository.findAllByStartDateBetween(from, to);
+//		} catch (Exception ex) {
+//			throw new HolidayEventException(ex.getMessage());
+//		}
+//	}
 
 	public List<HolidayRequestEvent> findAllByEventCreator(String mailAziendaleCreator) {
 		try {
@@ -83,29 +83,29 @@ public class HolidayEventService {
 		}
 	}
 
-	public List<HolidayRequestEvent> findAllByDateCreatorType(Date from, Date to, String mailAziendaleCreator,
-			CalendarEventType type) {
-		try {
-			return repository.findAllByStartDateBetweenByCreatorByType(from, to, mailAziendaleCreator, type);
-		} catch (Exception ex) {
-			if (ex instanceof NoSuchElementException) {
-				throw new EntityNotFoundException(ex.getMessage());
-			}
-			throw new HolidayEventException(ex.getMessage());
-		}
-	}
+//	public List<HolidayRequestEvent> findAllByDateCreatorType(Date from, Date to, String mailAziendaleCreator,
+//			CalendarEventType type) {
+//		try {
+//			return repository.findAllByStartDateBetweenByCreatorByType(from, to, mailAziendaleCreator, type);
+//		} catch (Exception ex) {
+//			if (ex instanceof NoSuchElementException) {
+//				throw new EntityNotFoundException(ex.getMessage());
+//			}
+//			throw new HolidayEventException(ex.getMessage());
+//		}
+//	}
 
-	public List<HolidayRequestEvent> findAllByDateResponsabileType(Date from, Date to, String mailAziendaleResponsabile,
-			CalendarEventType type) {
-		try {
-			return repository.findAllByStartDateBetweenByResponsabileByType(from, to, mailAziendaleResponsabile, type);
-		} catch (Exception ex) {
-			if (ex instanceof NoSuchElementException) {
-				throw new EntityNotFoundException(ex.getMessage());
-			}
-			throw new HolidayEventException(ex.getMessage());
-		}
-	}
+//	public List<HolidayRequestEvent> findAllByDateResponsabileType(Date from, Date to, String mailAziendaleResponsabile,
+//			CalendarEventType type) {
+//		try {
+//			return repository.findAllByStartDateBetweenByResponsabileByType(from, to, mailAziendaleResponsabile, type);
+//		} catch (Exception ex) {
+//			if (ex instanceof NoSuchElementException) {
+//				throw new EntityNotFoundException(ex.getMessage());
+//			}
+//			throw new HolidayEventException(ex.getMessage());
+//		}
+//	}
 
 	public HolidayRequestEvent updateApprovalStatus(String ID, ApprovalStatus status) {
 		try {

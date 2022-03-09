@@ -43,9 +43,7 @@ public class MeetingEvent extends CalendarEvent {
 	@Field
 	private String link;
 	
-	@Field
-	private List<Contact> conoscenzaCC;
-	
+		
 	@NotNull
 	@Field
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
