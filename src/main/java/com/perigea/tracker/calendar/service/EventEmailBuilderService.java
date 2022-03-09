@@ -48,8 +48,8 @@ public class EventEmailBuilderService {
 		templateData.put("creator",
 		String.format("%s %s", event.getEventCreator().getNome(), event.getEventCreator().getCognome()));
 		templateData.put("eventType", event.getType());
-		templateData.put("dataInizio", event.getStartDate());
-		templateData.put("dataFine", event.getEndDate());
+		templateData.put("dataInizio", Utils.formatDate(event.getStartDate()));
+		templateData.put("dataFine", Utils.formatDate(event.getEndDate()));
 		templateData.put("partecipanti", recipients);
 		templateData.put("azione", azione);
 		templateData.put("presenza", event.getInPerson().booleanValue());
@@ -73,7 +73,7 @@ public class EventEmailBuilderService {
 		templateData.put("creator",
 				String.format("%s %s", event.getEventCreator().getNome(), event.getEventCreator().getCognome()));
 		templateData.put("eventType", event.getType());
-		templateData.put("dataInizio", event.getStartDate());
+		templateData.put("dataInizio", Utils.formatDate(event.getStartDate()));
 		templateData.put("partecipanti", recipients);
 
 		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.NOTIFICATION_TEMPLATE.getDescrizione())

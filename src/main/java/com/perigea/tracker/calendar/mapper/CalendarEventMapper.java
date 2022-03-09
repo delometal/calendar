@@ -8,8 +8,9 @@ import com.perigea.tracker.commons.dto.CalendarEventDto;
 @Mapper(componentModel = "spring", uses = ContactMapper.class)
 public interface CalendarEventMapper {
 	
+	
 	CalendarEventDto mapToDto(CalendarEvent source);
 	
-
+	
 	CalendarEvent mapToEntity(CalendarEventDto source);
 }
