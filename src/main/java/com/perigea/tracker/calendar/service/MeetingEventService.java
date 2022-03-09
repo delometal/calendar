@@ -1,6 +1,6 @@
 package com.perigea.tracker.calendar.service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class MeetingEventService {
 	}
 	
 	
-	public List<MeetingEvent> getEventsBetween(Date from, Date to) {
+	public List<MeetingEvent> getEventsBetween(LocalDateTime from, LocalDateTime to) {
 		try {
 			List<MeetingEvent> events = repository.findAllByStartDateBetween(from, to);
 			return events;
@@ -78,7 +78,7 @@ public class MeetingEventService {
 		}
 	}
 
-	public List<MeetingEvent> getEventsBetweenByCreator(Date from, Date to, String mailAziendaleCreator) {
+	public List<MeetingEvent> getEventsBetweenByCreator(LocalDateTime from, LocalDateTime to, String mailAziendaleCreator) {
 		try {
 			return repository.findAllByStartDateBetweenByCreator(from, to, mailAziendaleCreator);
 		} catch (Exception ex) {
@@ -136,8 +136,9 @@ public class MeetingEventService {
 
 	private boolean isReserved(MeetingEvent event) {
 		
-		Date startDate = Utils.shiftTime(event.getStartDate(), -1);
-		Date endDate = Utils.shiftTime(event.getEndDate(), +1);
+		LocalDateTime startDate = Utils.shiftLocalDateTime(event.getStartDate(), -1);
+		LocalDateTime endDate = Utils.shiftLocalDateTime(event.getEndDate(), 1);
+		
 		
 		List<MeetingEvent> alreadyReserved = repository.blockingMeetingsInRange(startDate, endDate);
 		

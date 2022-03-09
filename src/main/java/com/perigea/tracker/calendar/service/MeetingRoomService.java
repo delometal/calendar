@@ -1,6 +1,6 @@
 package com.perigea.tracker.calendar.service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,11 +15,11 @@ public class MeetingRoomService {
 	@Autowired
 	private MeetingEventRepository repository;
 	
-	public boolean isFree(Date from, Date to) {
+	public boolean isFree(LocalDateTime from, LocalDateTime to) {
 		return repository.blockingMeetingsInRange(from, to).isEmpty();
 	}
 	
-	public boolean isFree(Date instant) {
+	public boolean isFree(LocalDateTime instant) {
 		return repository.blockingMeetingsAtInstant(instant).isEmpty();
 	}
 }

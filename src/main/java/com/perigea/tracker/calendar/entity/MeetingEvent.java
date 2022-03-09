@@ -1,6 +1,6 @@
 package com.perigea.tracker.calendar.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -47,12 +47,12 @@ public class MeetingEvent extends CalendarEvent {
 	@NotNull
 	@Field
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
-	private Date startDate;
+	private LocalDateTime startDate;
 	
 	@NotNull
 	@Field
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
-	private Date endDate;
+	private LocalDateTime endDate;
 	
 	public MeetingEvent() {
 		this.setType(CalendarEventType.Riunione);

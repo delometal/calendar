@@ -1,8 +1,7 @@
 package com.perigea.tracker.calendar.rest;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,7 +62,7 @@ public class MeetingEventController {
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		Email email = emailBuilder.build(event, "creato");		
-		Date notificationDate = Utils.shiftTime(event.getStartDate(), event.getReminederTime().getMinuti());
+		Date notificationDate = Utils.shiftTime(Utils.convertToDateViaInstant(event.getStartDate()), event.getReminederTime().getMinuti());
 
 		meetingService.save(event);
 		//FIXME Da scommentare per utilizzo
@@ -75,14 +74,16 @@ public class MeetingEventController {
 
 	@PostMapping(path = "/create-periodic-meeting")
 	public ResponseEntity<ResponseDto<MeetingEventDto>> addPeriodicMeeting(@RequestBody MeetingEventDto meetingEvent,
-			@RequestParam @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date expiration, @RequestParam String cron) {
+			@RequestParam LocalDateTime expiration, @RequestParam String cron) {
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		Email email = emailBuilder.build(event, "creato");
-
+		
+		Date expirationDate = Utils.convertToDateViaInstant(expiration);
+		
 		meetingService.save(event);
 		notificator.send(email);
-		schedulerService.scheduleNotificaPeriodica(cron, emailBuilder.buildReminder(event), expiration);
+		schedulerService.scheduleNotificaPeriodica(cron, emailBuilder.buildReminder(event), expirationDate);
 		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent)
 				.code(HttpStatus.OK.value()).description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}
@@ -91,7 +92,7 @@ public class MeetingEventController {
 	public ResponseEntity<ResponseDto<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent) {
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		Email email = emailBuilder.build(event, "modificato");
-		Date notificationDate = Utils.shiftTime(event.getStartDate(), event.getReminederTime().getMinuti());
+		Date notificationDate = Utils.shiftTime(Utils.convertToDateViaInstant(event.getStartDate()), event.getReminederTime().getMinuti());
 
 		meetingService.update(event);
 		notificator.send(email);
@@ -115,18 +116,16 @@ public class MeetingEventController {
 	@GetMapping(path = "/get-by-creator/{mailCreator}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllByCreator(@PathVariable String mailCreator) {
 		// finestra di tempo simmetrica di due mesi
-		Calendar cal = new GregorianCalendar();
-		cal.add(Calendar.MONTH, -1);
-		Date from = cal.getTime();
-		cal.add(Calendar.MONTH, 2);
-		Date to = cal.getTime();
+		LocalDateTime date = LocalDateTime.now();
+		LocalDateTime from = date.minusMonths(1);
+		LocalDateTime to = date.plusMonths(2);
 		return getAllInDateRangeByCreator(from, to, mailCreator);
 	}
 
 	@GetMapping(path = "/get-meetings-in-date-range/{from}/{to}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRange(
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to) {
+			@PathVariable LocalDateTime from,
+			@PathVariable LocalDateTime to) {
 
 		List<MeetingEvent> events = meetingService.getEventsBetween(from, to);
 		List<MeetingEventDto> meetings = mapper.mapToDtoList(events);
@@ -137,8 +136,9 @@ public class MeetingEventController {
 
 	@GetMapping(path = "/all-by-range-and-creator/{from}/{to}/{mailCreator}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRangeByCreator(
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to, @PathVariable String mailCreator) {
+			@PathVariable LocalDateTime from,
+			@PathVariable LocalDateTime to,
+			@PathVariable String mailCreator) {
 
 		List<MeetingEvent> events = meetingService.getEventsBetweenByCreator(from, to, mailCreator);
 		List<MeetingEventDto> meetings = mapper.mapToDtoList(events);
@@ -151,8 +151,8 @@ public class MeetingEventController {
 
 	@GetMapping(path = "/room-availability-in-range/{from}/{to}")
 	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date from,
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date to) {
+			@PathVariable LocalDateTime from,
+			@PathVariable LocalDateTime to) {
 		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(from, to))
 				.description(String.format("Disponibiltà sala riunioni da %s a %s", from.toString(), to.toString()))
 				.code(HttpStatus.OK.value()).build(), HttpStatus.OK);
@@ -160,7 +160,7 @@ public class MeetingEventController {
 
 	@GetMapping(path = "/room-availability/{instant}")
 	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date instant) {
+			@PathVariable LocalDateTime instant) {
 
 		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(instant))
 				.description(String.format("Disponibiltà sala riunioni in data %s", instant.toString()))
@@ -169,8 +169,8 @@ public class MeetingEventController {
 
 	@GetMapping(path = "/all-dates-meetings-reserved/{startDate}/{endDate}")
 	public ResponseEntity<ResponseDto<List<MeetingEventReserved>>> getAllDatesMeetingsReserved(
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date startDate,
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date endDate) {
+			@PathVariable  LocalDateTime startDate,
+			@PathVariable  LocalDateTime endDate) {
 
 		List<MeetingEvent> meetingsEvents = meetingEventRepository.blockingMeetingsInRange(startDate, endDate);
 		List<MeetingEventReserved> meetingsReserved = meetingsEvents.stream()
@@ -185,8 +185,8 @@ public class MeetingEventController {
 	
 	@GetMapping(path = "/all-meetings-reserved/{startDate}/{endDate}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllMeetingsReserved(
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date startDate,
-			@PathVariable @DateTimeFormat(pattern = Utils.DATE_FORMAT) Date endDate) {
+			@PathVariable  LocalDateTime startDate,
+			@PathVariable  LocalDateTime endDate) {
 
 		List<MeetingEvent> meetingsEvents = meetingEventRepository.blockingMeetingsInRange(startDate, endDate);
 		
