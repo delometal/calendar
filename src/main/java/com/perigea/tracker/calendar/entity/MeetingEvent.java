@@ -46,12 +46,12 @@ public class MeetingEvent extends CalendarEvent {
 		
 	@NotNull
 	@Field
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
+//	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
 	private LocalDateTime startDate;
 	
 	@NotNull
 	@Field
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
+//	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
 	private LocalDateTime endDate;
 	
 	public MeetingEvent() {
