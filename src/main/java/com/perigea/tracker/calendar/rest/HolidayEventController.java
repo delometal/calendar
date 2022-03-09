@@ -1,10 +1,8 @@
 package com.perigea.tracker.calendar.rest;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.perigea.tracker.calendar.entity.HolidayRequestEvent;
 import com.perigea.tracker.calendar.mapper.HolidayEventMapper;
+import com.perigea.tracker.calendar.mapper.HolidayMapper;
+import com.perigea.tracker.calendar.model.HolidayEvent;
 import com.perigea.tracker.calendar.service.EventEmailBuilderService;
 import com.perigea.tracker.calendar.service.HolidayEventService;
 import com.perigea.tracker.commons.dto.HolidayEventRequestDto;
 import com.perigea.tracker.commons.dto.ResponseDto;
-import com.perigea.tracker.commons.enums.CalendarEventType;
 import com.perigea.tracker.commons.model.Email;
-import com.perigea.tracker.commons.utils.Utils;
 
 @RestController
 @RequestMapping(path = "/holiday")
@@ -34,7 +32,7 @@ public class HolidayEventController {
 	private HolidayEventService holidayEventService;
 
 	@Autowired
-	private HolidayEventMapper holidayMapper;
+	private HolidayEventMapper holidayEventMapper;
 
 	@Autowired
 	private EventEmailBuilderService emailBuilder;
@@ -42,9 +40,12 @@ public class HolidayEventController {
 	@Autowired
 	private NotificationRestClient notificator;
 	
+	@Autowired
+	private HolidayMapper holidayMapper;
+	
 	@PostMapping(path = "/add")
 	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> addHolidayEvent(@RequestBody HolidayEventRequestDto HolidayEvent) {
-		HolidayRequestEvent event = holidayMapper.mapToEntity(HolidayEvent);
+		HolidayRequestEvent event = holidayEventMapper.mapToEntity(HolidayEvent);
 		Email email = emailBuilder.build(event, "creato");
 		notificator.send(email);
 		holidayEventService.save(event);
@@ -56,7 +57,7 @@ public class HolidayEventController {
 	
 	@DeleteMapping(path = "/delete")
 	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> deleteHolidayEvent(@RequestBody HolidayEventRequestDto HolidayEvent) {
-		HolidayRequestEvent toBeDeleted = holidayMapper.mapToEntity(HolidayEvent);
+		HolidayRequestEvent toBeDeleted = holidayEventMapper.mapToEntity(HolidayEvent);
 		holidayEventService.delete(toBeDeleted);
 		Email email = emailBuilder.build(toBeDeleted, "eliminato");
 		notificator.send(email);
@@ -66,7 +67,7 @@ public class HolidayEventController {
 
 	@PutMapping(path = "/update")
 	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> updateHolidayEvent(@RequestBody HolidayEventRequestDto HolidayEvent) {
-		HolidayRequestEvent toBeUpdated = holidayMapper.mapToEntity(HolidayEvent);
+		HolidayRequestEvent toBeUpdated = holidayEventMapper.mapToEntity(HolidayEvent);
 		holidayEventService.update(toBeUpdated);
 		Email email = emailBuilder.build(toBeUpdated, "modificato");
 		notificator.send(email);
@@ -75,13 +76,26 @@ public class HolidayEventController {
 				HttpStatus.OK);
 	}
 	
-	@PostMapping(path = "/approve")
+	@PostMapping(path = "/approve-all")
 	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> approveEvent(@RequestBody HolidayEventRequestDto holidayEvent) {
-		HolidayRequestEvent toBeApproved = holidayMapper.mapToEntity(holidayEvent);
-		holidayEventService.update(toBeApproved);
-		Email email = emailBuilder.buildApproval(toBeApproved);
+		HolidayRequestEvent toBeApproved = holidayEventMapper.mapToEntity(holidayEvent);
+		holidayEventService.updateApprovalStatus(toBeApproved.getId(), toBeApproved.getApproved());
+		List<HolidayEvent> declinedEvents = holidayEventService.getDeclinedSingleEvents(toBeApproved.getHolidays());
+		Email email = emailBuilder.buildApproval(toBeApproved, declinedEvents);
 		notificator.send(email);
 		return new ResponseEntity<>(ResponseDto.<HolidayEventRequestDto>builder().data(holidayEvent).code(HttpStatus.OK.value())
+				.description(String.format("Stato di approvazione: %s", holidayEvent.getApproved())).build(), 
+				HttpStatus.OK);
+	}
+	
+	@PostMapping(path = "/approve-single-event")
+	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> approveSingleEvent(@RequestBody HolidayEventRequestDto holidayEvent) {
+		List<HolidayEvent> events = holidayMapper.mapToEntityList(holidayEvent.getHolidays());
+		List<HolidayEvent> declinedEvents = holidayEventService.getDeclinedSingleEvents(events);
+		HolidayRequestEvent toBeApproved = holidayEventService.approveSingleEvent(events, holidayEvent.getId());
+		Email email = emailBuilder.buildApproval(toBeApproved, declinedEvents);
+		notificator.send(email);
+		return new ResponseEntity<>(ResponseDto.<HolidayEventRequestDto>builder().data(holidayEventMapper.mapToDto(toBeApproved)).code(HttpStatus.OK.value())
 				.description(String.format("Stato di approvazione: %s", holidayEvent.getApproved())).build(), 
 				HttpStatus.OK);
 	}
@@ -113,7 +127,7 @@ public class HolidayEventController {
 	@GetMapping(path = "/get-by-event-creator/{mailAziendaleCreator}")
 	public ResponseEntity<ResponseDto<List<HolidayEventRequestDto>>> findAllByCreator(@PathVariable String mailAziendaleCreator) {
 		List<HolidayRequestEvent> events = holidayEventService.findAllByEventCreator(mailAziendaleCreator);
-		List<HolidayEventRequestDto> holidays = holidayMapper.mapToDtoList(events);
+		List<HolidayEventRequestDto> holidays = holidayEventMapper.mapToDtoList(events);
 		return new ResponseEntity<>(
 				ResponseDto.<List<HolidayEventRequestDto>>builder().data(holidays).code(HttpStatus.OK.value())
 						.description(String.format("Lista dei permessi di %s", mailAziendaleCreator)).build(),
@@ -124,7 +138,7 @@ public class HolidayEventController {
 	public ResponseEntity<ResponseDto<List<HolidayEventRequestDto>>> findAllByResponsabile(
 			@PathVariable String mailAziendaleResponsabile) {
 		List<HolidayRequestEvent> events = holidayEventService.findAllByResponsabile(mailAziendaleResponsabile);
-		List<HolidayEventRequestDto> leaves = holidayMapper.mapToDtoList(events);
+		List<HolidayEventRequestDto> leaves = holidayEventMapper.mapToDtoList(events);
 		return new ResponseEntity<>(
 				ResponseDto.<List<HolidayEventRequestDto>>builder().data(leaves).code(HttpStatus.OK.value())
 						.description(String.format("Lista dei permessi di %s", mailAziendaleResponsabile)).build(),

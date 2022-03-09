@@ -1,6 +1,8 @@
 package com.perigea.tracker.calendar.service;
 
-import java.util.Date;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.perigea.tracker.calendar.entity.HolidayRequestEvent;
+import com.perigea.tracker.calendar.model.HolidayEvent;
 import com.perigea.tracker.calendar.repository.HolidayEventRepository;
 import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.enums.CalendarEventType;
@@ -36,22 +39,14 @@ public class HolidayEventService {
 		logger.info(String.format("%s rimosso", event.getType()));
 
 	}
-	
+
 	public void update(HolidayRequestEvent event) {
 		if (repository.findById(event.getId()).isEmpty()) {
 			throw new EntityNotFoundException(event.getId() + " not found");
 		}
-		System.out.println(repository.findById(event.getId()));
+
 		repository.save(event);
 	}
-
-//	public List<HolidayRequestEvent> getEventsBetween(Date from, Date to) {
-//		try {
-//			return repository.findAllByStartDateBetween(from, to);
-//		} catch (Exception ex) {
-//			throw new HolidayEventException(ex.getMessage());
-//		}
-//	}
 
 	public List<HolidayRequestEvent> findAllByEventCreator(String mailAziendaleCreator) {
 		try {
@@ -83,6 +78,58 @@ public class HolidayEventService {
 		}
 	}
 
+	public HolidayRequestEvent updateApprovalStatus(String ID, ApprovalStatus status) {
+		try {
+			HolidayRequestEvent event = findById(ID);
+			event.setApproved(status);
+			for (HolidayEvent e : event.getHolidays()) {
+				e.setStatus(status);
+			}
+
+			repository.save(event);
+			logger.info(String.format("Evento %s aggiornato", event.getType()));
+			return event;
+		} catch (Exception ex) {
+			throw new HolidayEventException(ex.getMessage());
+		}
+	}
+
+	public HolidayRequestEvent findById(String leaveId) {
+		try {
+			Optional<HolidayRequestEvent> optionalEvent = repository.findById(leaveId);
+			return optionalEvent.isPresent() ? optionalEvent.get() : null;
+		} catch (Exception ex) {
+			if (ex instanceof NoSuchElementException) {
+				throw new EntityNotFoundException(ex.getMessage());
+			}
+			throw new HolidayEventException(ex.getMessage());
+		}
+	}
+	
+	public HolidayRequestEvent approveSingleEvent(List<HolidayEvent> list, String id) {
+		if (repository.findById(id).isEmpty()) {
+			throw new EntityNotFoundException(id + " not found");
+		}
+		HolidayRequestEvent event = repository.findById(id).get();
+		event.setHolidays(list);
+		for(HolidayEvent e: list) {
+			if(e.getStatus().equals(ApprovalStatus.DECLINED)) {
+				event.setApproved(ApprovalStatus.DECLINED);
+				break;
+			}
+		}
+		return repository.save(event);
+	}
+	
+	public List<HolidayEvent> getDeclinedSingleEvents(List<HolidayEvent> list) {
+		List<HolidayEvent> declinedSingleEvents = new ArrayList<HolidayEvent>();
+		for(HolidayEvent e : list) {
+			if(e.getStatus().equals(ApprovalStatus.DECLINED)) {
+				declinedSingleEvents.add(e);
+			}
+		}
+		return declinedSingleEvents;
+	}
 //	public List<HolidayRequestEvent> findAllByDateCreatorType(Date from, Date to, String mailAziendaleCreator,
 //			CalendarEventType type) {
 //		try {
@@ -107,27 +154,12 @@ public class HolidayEventService {
 //		}
 //	}
 
-	public HolidayRequestEvent updateApprovalStatus(String ID, ApprovalStatus status) {
-		try {
-			HolidayRequestEvent event = findById(ID);
-			event.setApproved(status);
-			repository.save(event);
-			logger.info(String.format("Evento %s aggiornato", event.getType()));
-			return event;
-		} catch (Exception ex) {
-			throw new HolidayEventException(ex.getMessage());
-		}
-	}
+//	public List<HolidayRequestEvent> getEventsBetween(Date from, Date to) {
+//		try {
+//			return repository.findAllByStartDateBetween(from, to);
+//		} catch (Exception ex) {
+//			throw new HolidayEventException(ex.getMessage());
+//		}
+//	}
 
-	public HolidayRequestEvent findById(String leaveId) {
-		try {
-			Optional<HolidayRequestEvent> optionalEvent = repository.findById(leaveId);
-			return optionalEvent.isPresent() ? optionalEvent.get() : null;
-		} catch (Exception ex) {
-			if (ex instanceof NoSuchElementException) {
-				throw new EntityNotFoundException(ex.getMessage());
-			}
-			throw new HolidayEventException(ex.getMessage());
-		}
-	}
 }

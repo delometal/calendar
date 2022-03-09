@@ -14,7 +14,9 @@ import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.entity.TimesheetEvent;
 import com.perigea.tracker.calendar.factory.ICSFactory;
 import com.perigea.tracker.calendar.model.Contact;
+import com.perigea.tracker.calendar.model.HolidayEvent;
 import com.perigea.tracker.commons.dto.AttachmentDto;
+import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.enums.EMese;
 import com.perigea.tracker.commons.enums.EmailTemplates;
 import com.perigea.tracker.commons.enums.EmailType;
@@ -138,18 +140,25 @@ public class EventEmailBuilderService {
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
 
-	public Email buildApproval(HolidayRequestEvent event) {
+	
+		
+		public Email buildApproval(HolidayRequestEvent event, List<HolidayEvent> list) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getEventCreator().getMailAziendale());
 		Map<String, Object> templateData = new HashMap<>();
+		 
+		Boolean approved = false;
+		if(event.getApproved().equals(ApprovalStatus.APPROVED)) {
+			approved = true;
+		} 
+		
+		templateData.put("approved", approved);
 		templateData.put("utente", event.getResponsabile().getMailAziendale());
-		templateData.put("eventType", event.getType());
 		templateData.put("azione", event.getApproved().toString().toLowerCase());
-//		templateData.put("dataInizio", Utils.DATE_FORMATTER.format(event.getStartDate()));
-//		templateData.put("dataFine", Utils.DATE_FORMATTER.format(event.getEndDate()));
+		templateData.put("events", list);
 
-		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.HOLIDAY_TEMPLATE.getDescrizione())
+		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.APPROVAL_HOLIDAYS.getDescrizione())
 				.templateModel(templateData)
 				.subject(String.format("%s %s: %s %s", event.getResponsabile().getNome(),
 						event.getResponsabile().getCognome(), event.getType(),
@@ -157,12 +166,18 @@ public class EventEmailBuilderService {
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
 	
+		
 	public AttachmentDto addICSFile(MeetingEvent event) {
 		AttachmentDto attch = new AttachmentDto();
 		attch.setBArray(ICSFactory.createICS(event));
 		attch.setFileName("text/calendar");
 		return attch;
 	}
+	
+	
+
+	
+
 	
 //	public List<AttachmentDto> addAttachments(List<String> filePaths) {
 //		List<AttachmentDto> attachments = new ArrayList<AttachmentDto>();
