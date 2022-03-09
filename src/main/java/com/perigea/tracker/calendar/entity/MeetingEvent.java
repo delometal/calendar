@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.perigea.tracker.calendar.model.Contact;
 import com.perigea.tracker.commons.annotations.NotNull;
 import com.perigea.tracker.commons.enums.CalendarEventType;
+import com.perigea.tracker.commons.utils.Utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,12 +47,12 @@ public class MeetingEvent extends CalendarEvent {
 		
 	@NotNull
 	@Field
-//	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Utils.DATE_FORMAT, timezone = "Europe/Rome")
 	private LocalDateTime startDate;
 	
 	@NotNull
 	@Field
-//	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Utils.DATE_FORMAT, timezone = "Europe/Rome")
 	private LocalDateTime endDate;
 	
 	public MeetingEvent() {
