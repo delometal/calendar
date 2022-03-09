@@ -11,8 +11,8 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import com.perigea.tracker.calendar.configuration.MongoConfig;
-import com.perigea.tracker.calendar.entity.Contact;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
+import com.perigea.tracker.calendar.model.Contact;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 
 @DataMongoTest

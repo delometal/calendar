@@ -3,6 +3,7 @@ package com.perigea.tracker.calendar.entity;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.perigea.tracker.calendar.model.Contact;
 import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 

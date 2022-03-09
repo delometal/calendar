@@ -1,4 +1,4 @@
-package com.perigea.tracker.calendar.entity;
+package com.perigea.tracker.calendar.model;
 
 import java.io.Serializable;
 

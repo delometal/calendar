@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.perigea.tracker.calendar.entity.Contact;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
+import com.perigea.tracker.calendar.model.Contact;
 import com.perigea.tracker.calendar.repository.MeetingEventRepository;
 import com.perigea.tracker.commons.enums.ParticipationStatus;
 import com.perigea.tracker.commons.exception.EntityNotFoundException;

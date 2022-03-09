@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.perigea.tracker.calendar.entity.HolidayEvent;
+import com.perigea.tracker.calendar.entity.HolidayRequestEvent;
 import com.perigea.tracker.calendar.repository.HolidayEventRepository;
 import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.enums.CalendarEventType;
@@ -25,19 +25,19 @@ public class HolidayEventService {
 	@Autowired
 	private Logger logger;
 
-	public void save(HolidayEvent event) {
+	public void save(HolidayRequestEvent event) {
 		repository.save(event);
 		logger.info(String.format("%s aggiunto in persistenza", event.getType()));
 
 	}
 
-	public void delete(HolidayEvent event) {
+	public void delete(HolidayRequestEvent event) {
 		repository.delete(event);
 		logger.info(String.format("%s rimosso", event.getType()));
 
 	}
 	
-	public void update(HolidayEvent event) {
+	public void update(HolidayRequestEvent event) {
 		if (repository.findById(event.getId()).isEmpty()) {
 			throw new EntityNotFoundException(event.getId() + " not found");
 		}
@@ -45,7 +45,7 @@ public class HolidayEventService {
 		repository.save(event);
 	}
 
-	public List<HolidayEvent> getEventsBetween(Date from, Date to) {
+	public List<HolidayRequestEvent> getEventsBetween(Date from, Date to) {
 		try {
 			return repository.findAllByStartDateBetween(from, to);
 		} catch (Exception ex) {
@@ -53,7 +53,7 @@ public class HolidayEventService {
 		}
 	}
 
-	public List<HolidayEvent> findAllByEventCreator(String mailAziendaleCreator) {
+	public List<HolidayRequestEvent> findAllByEventCreator(String mailAziendaleCreator) {
 		try {
 			return repository.findAllByEventCreator(mailAziendaleCreator);
 		} catch (Exception ex) {
@@ -64,7 +64,7 @@ public class HolidayEventService {
 		}
 	}
 
-	public List<HolidayEvent> findAllByResponsabile(String mailAziendaleResponsabile) {
+	public List<HolidayRequestEvent> findAllByResponsabile(String mailAziendaleResponsabile) {
 		try {
 			return repository.findByResponsabile(mailAziendaleResponsabile);
 		} catch (Exception ex) {
@@ -75,7 +75,7 @@ public class HolidayEventService {
 		}
 	}
 
-	public List<HolidayEvent> findAllByType(CalendarEventType type) {
+	public List<HolidayRequestEvent> findAllByType(CalendarEventType type) {
 		try {
 			return repository.findAllByType(type);
 		} catch (Exception ex) {
@@ -83,7 +83,7 @@ public class HolidayEventService {
 		}
 	}
 
-	public List<HolidayEvent> findAllByDateCreatorType(Date from, Date to, String mailAziendaleCreator,
+	public List<HolidayRequestEvent> findAllByDateCreatorType(Date from, Date to, String mailAziendaleCreator,
 			CalendarEventType type) {
 		try {
 			return repository.findAllByStartDateBetweenByCreatorByType(from, to, mailAziendaleCreator, type);
@@ -95,7 +95,7 @@ public class HolidayEventService {
 		}
 	}
 
-	public List<HolidayEvent> findAllByDateResponsabileType(Date from, Date to, String mailAziendaleResponsabile,
+	public List<HolidayRequestEvent> findAllByDateResponsabileType(Date from, Date to, String mailAziendaleResponsabile,
 			CalendarEventType type) {
 		try {
 			return repository.findAllByStartDateBetweenByResponsabileByType(from, to, mailAziendaleResponsabile, type);
@@ -107,9 +107,9 @@ public class HolidayEventService {
 		}
 	}
 
-	public HolidayEvent updateApprovalStatus(String ID, ApprovalStatus status) {
+	public HolidayRequestEvent updateApprovalStatus(String ID, ApprovalStatus status) {
 		try {
-			HolidayEvent event = findById(ID);
+			HolidayRequestEvent event = findById(ID);
 			event.setApproved(status);
 			repository.save(event);
 			logger.info(String.format("Evento %s aggiornato", event.getType()));
@@ -119,9 +119,9 @@ public class HolidayEventService {
 		}
 	}
 
-	public HolidayEvent findById(String leaveId) {
+	public HolidayRequestEvent findById(String leaveId) {
 		try {
-			Optional<HolidayEvent> optionalEvent = repository.findById(leaveId);
+			Optional<HolidayRequestEvent> optionalEvent = repository.findById(leaveId);
 			return optionalEvent.isPresent() ? optionalEvent.get() : null;
 		} catch (Exception ex) {
 			if (ex instanceof NoSuchElementException) {

@@ -15,8 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 
-import com.perigea.tracker.calendar.entity.Contact;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
+import com.perigea.tracker.calendar.model.Contact;
 import com.perigea.tracker.calendar.repository.MeetingEventRepository;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 

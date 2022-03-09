@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
-import com.perigea.tracker.calendar.entity.Contact;
+import com.perigea.tracker.calendar.model.Contact;
 import com.perigea.tracker.commons.dto.ContactDto;
 
 @Mapper(componentModel = "spring")

@@ -9,11 +9,11 @@ import java.util.TimeZone;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.perigea.tracker.calendar.entity.Contact;
-import com.perigea.tracker.calendar.entity.HolidayEvent;
+import com.perigea.tracker.calendar.entity.HolidayRequestEvent;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.entity.TimesheetEvent;
 import com.perigea.tracker.calendar.factory.ICSFactory;
+import com.perigea.tracker.calendar.model.Contact;
 import com.perigea.tracker.commons.dto.AttachmentDto;
 import com.perigea.tracker.commons.enums.EMese;
 import com.perigea.tracker.commons.enums.EmailTemplates;
@@ -101,7 +101,7 @@ public class EventEmailBuilderService {
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
 
-	public Email build(HolidayEvent event, String azione) {
+	public Email build(HolidayRequestEvent event, String azione) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getResponsabile().getMailAziendale());
@@ -109,8 +109,8 @@ public class EventEmailBuilderService {
 		templateData.put("utente", event.getEventCreator().getMailAziendale());
 		templateData.put("eventType", event.getType());
 		templateData.put("azione", azione);
-		templateData.put("dataInizio", Utils.DATE_FORMATTER.format(event.getStartDate()));
-		templateData.put("dataFine", Utils.DATE_FORMATTER.format(event.getEndDate()));
+//		templateData.put("dataInizio", Utils.DATE_FORMATTER.format(event.getStartDate()));
+//		templateData.put("dataFine", Utils.DATE_FORMATTER.format(event.getEndDate()));
 
 		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.HOLIDAY_TEMPLATE.getDescrizione())
 				.templateModel(templateData)
@@ -139,7 +139,7 @@ public class EventEmailBuilderService {
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
 
-	public Email buildApproval(HolidayEvent event) {
+	public Email buildApproval(HolidayRequestEvent event) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getEventCreator().getMailAziendale());
@@ -147,8 +147,8 @@ public class EventEmailBuilderService {
 		templateData.put("utente", event.getResponsabile().getMailAziendale());
 		templateData.put("eventType", event.getType());
 		templateData.put("azione", event.getApproved().toString().toLowerCase());
-		templateData.put("dataInizio", Utils.DATE_FORMATTER.format(event.getStartDate()));
-		templateData.put("dataFine", Utils.DATE_FORMATTER.format(event.getEndDate()));
+//		templateData.put("dataInizio", Utils.DATE_FORMATTER.format(event.getStartDate()));
+//		templateData.put("dataFine", Utils.DATE_FORMATTER.format(event.getEndDate()));
 
 		return Email.builder().eventId(event.getId()).from(sender).templateName(EmailTemplates.HOLIDAY_TEMPLATE.getDescrizione())
 				.templateModel(templateData)

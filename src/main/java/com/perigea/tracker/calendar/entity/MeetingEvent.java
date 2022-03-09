@@ -1,10 +1,13 @@
 package com.perigea.tracker.calendar.entity;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.perigea.tracker.calendar.model.Contact;
 import com.perigea.tracker.commons.annotations.NotNull;
 import com.perigea.tracker.commons.enums.CalendarEventType;
 
@@ -39,7 +42,20 @@ public class MeetingEvent extends CalendarEvent {
 
 	@Field
 	private String link;
-
+	
+	@Field
+	private List<Contact> conoscenzaCC;
+	
+	@NotNull
+	@Field
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
+	private Date startDate;
+	
+	@NotNull
+	@Field
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Rome")
+	private Date endDate;
+	
 	public MeetingEvent() {
 		this.setType(CalendarEventType.Riunione);
 	}

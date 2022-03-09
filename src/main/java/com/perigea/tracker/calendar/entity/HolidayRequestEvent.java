@@ -1,8 +1,12 @@
 package com.perigea.tracker.calendar.entity;
 
+import java.util.List;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.perigea.tracker.calendar.model.Contact;
+import com.perigea.tracker.calendar.model.HolidayEvent;
 import com.perigea.tracker.commons.annotations.NotNull;
 import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.enums.CalendarEventType;
@@ -19,7 +23,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class HolidayEvent extends CalendarEvent {
+public class HolidayRequestEvent extends CalendarEvent {
 	
 	private static final long serialVersionUID = 6657896728352189565L;
 
@@ -31,7 +35,10 @@ public class HolidayEvent extends CalendarEvent {
 	@Field
 	private ApprovalStatus approved;
 	
-	public HolidayEvent (CalendarEventType type) {
+	@Field
+	private List<HolidayEvent> holidays;
+	
+	public HolidayRequestEvent (CalendarEventType type) {
 		this.setType(type);
 		this.setApproved(ApprovalStatus.PENDING);
 	}

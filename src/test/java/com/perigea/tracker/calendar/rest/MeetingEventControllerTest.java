@@ -21,9 +21,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.perigea.tracker.calendar.entity.Contact;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.mapper.MeetingMapper;
+import com.perigea.tracker.calendar.model.Contact;
 import com.perigea.tracker.calendar.service.EventEmailBuilderService;
 import com.perigea.tracker.calendar.service.MeetingEventService;
 import com.perigea.tracker.calendar.service.MeetingRoomService;
