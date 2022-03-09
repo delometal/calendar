@@ -42,6 +42,6 @@ public class CalendarEvent implements Serializable {
 	private Contact eventCreator;
 
 	@Field
-	private ReminderEventTime reminederTime;
+	private ReminderEventTime reminderTime;
 
 }

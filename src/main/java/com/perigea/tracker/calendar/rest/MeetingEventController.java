@@ -62,12 +62,12 @@ public class MeetingEventController {
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		Email email = emailBuilder.build(event, "creato");		
-		Date notificationDate = Utils.shiftTime(Utils.convertToDateViaInstant(event.getStartDate()), event.getReminederTime().getMinuti());
+		Date notificationDate = Utils.shiftTime(Utils.convertToDateViaInstant(event.getStartDate()), event.getReminderTime().getMinuti());
 
 		meetingService.save(event);
-		//FIXME Da scommentare per utilizzo
-//		notificator.send(email);
-//		schedulerService.scheduleNotifica(notificationDate, emailBuilder.buildReminder(event));
+	
+		notificator.send(email);
+		schedulerService.scheduleNotifica(notificationDate, emailBuilder.buildReminder(event));
 		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent)
 				.code(HttpStatus.OK.value()).description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}
@@ -92,7 +92,7 @@ public class MeetingEventController {
 	public ResponseEntity<ResponseDto<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent) {
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		Email email = emailBuilder.build(event, "modificato");
-		Date notificationDate = Utils.shiftTime(Utils.convertToDateViaInstant(event.getStartDate()), event.getReminederTime().getMinuti());
+		Date notificationDate = Utils.shiftTime(Utils.convertToDateViaInstant(event.getStartDate()), event.getReminderTime().getMinuti());
 
 		meetingService.update(event);
 		notificator.send(email);
