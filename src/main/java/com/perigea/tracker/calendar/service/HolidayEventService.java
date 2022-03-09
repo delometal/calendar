@@ -1,6 +1,5 @@
 package com.perigea.tracker.calendar.service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
