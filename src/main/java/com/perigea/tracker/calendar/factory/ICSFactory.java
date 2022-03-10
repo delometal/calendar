@@ -1,6 +1,6 @@
 package com.perigea.tracker.calendar.factory;
 
-import com.perigea.tracker.calendar.entity.MeetingEvent;
+import com.perigea.tracker.commons.dto.MeetingEventDto;
 import com.perigea.tracker.commons.utils.Utils;
 
 import biweekly.Biweekly;
@@ -10,7 +10,7 @@ import biweekly.component.VEvent;
 
 public abstract class ICSFactory {
 	
-	public static byte[] createICS(MeetingEvent meetingEvent) {
+	public static byte[] createICS(MeetingEventDto meetingEvent) {
 		
 		ICalendar ical = new ICalendar();
 		VEvent event = new VEvent();

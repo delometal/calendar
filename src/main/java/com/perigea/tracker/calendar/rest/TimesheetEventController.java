@@ -42,7 +42,7 @@ public class TimesheetEventController {
 	public ResponseEntity<ResponseDto<TimesheetEventDto>> createTimesheetEvent(
 			@RequestBody TimesheetEventDto timesheetEvent) {
 		TimesheetEvent event = timesheetMapper.mapToEntity(timesheetEvent);
-		Email email = emailBuilder.build(event, "creato");
+		Email email = emailBuilder.build(timesheetEvent, "creato");
 		notificator.send(email);
 		timesheetEventService.save(event);
 		return new ResponseEntity<>(ResponseDto.<TimesheetEventDto>builder().data(timesheetEvent)
@@ -56,7 +56,7 @@ public class TimesheetEventController {
 			@RequestBody TimesheetEventDto timesheetEvent) {
 		TimesheetEvent toBeDeleted = timesheetMapper.mapToEntity(timesheetEvent);
 		timesheetEventService.delete(toBeDeleted);
-		Email email = emailBuilder.build(toBeDeleted, "eliminato");
+		Email email = emailBuilder.build(timesheetEvent, "eliminato");
 		notificator.send(email);
 		return new ResponseEntity<>(
 				ResponseDto.<TimesheetEventDto>builder().data(timesheetEvent).code(HttpStatus.OK.value())
@@ -69,7 +69,7 @@ public class TimesheetEventController {
 			@RequestBody TimesheetEventDto timesheetEvent) {
 		TimesheetEvent toBeUpdated = timesheetMapper.mapToEntity(timesheetEvent);
 		timesheetEventService.update(toBeUpdated);
-		Email email = emailBuilder.build(toBeUpdated, "modificato");
+		Email email = emailBuilder.build(timesheetEvent, "modificato");
 		notificator.send(email);
 		return new ResponseEntity<>(ResponseDto.<TimesheetEventDto>builder().data(timesheetEvent)
 				.code(HttpStatus.OK.value())
@@ -81,7 +81,7 @@ public class TimesheetEventController {
 	public ResponseEntity<ResponseDto<TimesheetEventDto>> approveEvent(@RequestBody TimesheetEventDto timesheetEvent) {
 		TimesheetEvent toBeApproved = timesheetMapper.mapToEntity(timesheetEvent);
 		timesheetEventService.update(toBeApproved);
-		Email email = emailBuilder.buildApproval(toBeApproved);
+		Email email = emailBuilder.buildApproval(timesheetEvent);
 		notificator.send(email);
 		return new ResponseEntity<>(ResponseDto.<TimesheetEventDto>builder().data(timesheetEvent)
 				.code(HttpStatus.OK.value())

@@ -12,15 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.perigea.tracker.calendar.configuration.ApplicationProperties;
-import com.perigea.tracker.calendar.entity.HolidayRequestEvent;
-import com.perigea.tracker.calendar.entity.MeetingEvent;
-import com.perigea.tracker.calendar.entity.TimesheetEvent;
 import com.perigea.tracker.calendar.factory.ICSFactory;
-import com.perigea.tracker.calendar.model.Contact;
 import com.perigea.tracker.calendar.model.HolidayEvent;
 import com.perigea.tracker.commons.dto.AttachmentDto;
-import com.perigea.tracker.commons.enums.ApprovalStatus;
+import com.perigea.tracker.commons.dto.ContactDto;
 import com.perigea.tracker.commons.dto.CreatedUtenteNotificaDto;
+import com.perigea.tracker.commons.dto.HolidayEventRequestDto;
+import com.perigea.tracker.commons.dto.MeetingEventDto;
+import com.perigea.tracker.commons.dto.TimesheetEventDto;
+import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.enums.EMese;
 import com.perigea.tracker.commons.enums.EmailTemplates;
 import com.perigea.tracker.commons.enums.EmailType;
@@ -41,7 +41,7 @@ public class EventEmailBuilderService {
 	private ApplicationProperties properties;
 	
 
-	public Email build(MeetingEvent event, String azione) {
+	public Email build(MeetingEventDto event, String azione) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipients = new ArrayList<>();
 		Map<String, Object> templateData = new HashMap<>();
@@ -50,7 +50,7 @@ public class EventEmailBuilderService {
 		if (!NotNullValidator.validate(event))
 			throw new NullFieldException(String.format("%s must not be null!", NotNullValidator.getDetails(event)));
 		
-		for (Contact c : event.getParticipants()) {
+		for (ContactDto c : event.getParticipants()) {
 			recipients.add(c.getMailAziendale());
 		}
 		//attachments = addAttachments(list);
@@ -69,10 +69,10 @@ public class EventEmailBuilderService {
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).attachments(attachments).build();
 	}
 
-	public Email buildReminder(MeetingEvent event) {
+	public Email buildReminder(MeetingEventDto event) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipients = new ArrayList<>();
-		for (Contact c : event.getParticipants()) {
+		for (ContactDto c : event.getParticipants()) {
 			recipients.add(c.getMailAziendale());
 		}
 		
@@ -92,7 +92,7 @@ public class EventEmailBuilderService {
 
 	}
 	
-	public Email build(TimesheetEvent event, String azione) {
+	public Email build(TimesheetEventDto event, String azione) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		EMese mese = EMese.getByMonthId(event.getTimesheet().getMese());
 		List<String> recipient = new ArrayList<>();
@@ -111,7 +111,7 @@ public class EventEmailBuilderService {
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
 
-	public Email build(HolidayRequestEvent event, String azione) {
+	public Email build(HolidayEventRequestDto event, String azione) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getResponsabile().getMailAziendale());
@@ -128,7 +128,7 @@ public class EventEmailBuilderService {
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
 	
-	public Email buildApproval(TimesheetEvent event) {
+	public Email buildApproval(TimesheetEventDto event) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		EMese mese = EMese.getByMonthId(event.getTimesheet().getMese());
 		List<String> recipient = new ArrayList<>();
@@ -150,7 +150,7 @@ public class EventEmailBuilderService {
 
 	
 		
-		public Email buildApproval(HolidayRequestEvent event, List<HolidayEvent> list) {
+	public Email buildApproval(HolidayEventRequestDto event, List<HolidayEvent> list) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getEventCreator().getMailAziendale());
@@ -211,7 +211,7 @@ public class EventEmailBuilderService {
 	}
 	
 	
-	public AttachmentDto addICSFile(MeetingEvent event) {
+	public AttachmentDto addICSFile(MeetingEventDto event) {
 		AttachmentDto attch = new AttachmentDto();
 		attch.setBArray(ICSFactory.createICS(event));
 		attch.setFileName("text/calendar");

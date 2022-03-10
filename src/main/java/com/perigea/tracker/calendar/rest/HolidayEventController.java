@@ -44,35 +44,35 @@ public class HolidayEventController {
 	private HolidayMapper holidayMapper;
 	
 	@PostMapping(path = "/add")
-	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> addHolidayEvent(@RequestBody HolidayEventRequestDto HolidayEvent) {
-		HolidayRequestEvent event = holidayEventMapper.mapToEntity(HolidayEvent);
-		Email email = emailBuilder.build(event, "creato");
+	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> addHolidayEvent(@RequestBody HolidayEventRequestDto holidayEvent) {
+		HolidayRequestEvent event = holidayEventMapper.mapToEntity(holidayEvent);
+		Email email = emailBuilder.build(holidayEvent, "creato");
 		notificator.send(email);
 		holidayEventService.save(event);
 		return new ResponseEntity<>(
-				ResponseDto.<HolidayEventRequestDto>builder().data(HolidayEvent).code(HttpStatus.OK.value())
-						.description(String.format("%s %s salvato", HolidayEvent.getType(),HolidayEvent.getId())).build(),
+				ResponseDto.<HolidayEventRequestDto>builder().data(holidayEvent).code(HttpStatus.OK.value())
+						.description(String.format("%s %s salvato", holidayEvent.getType(),holidayEvent.getId())).build(),
 				HttpStatus.OK);
 	}
 	
 	@DeleteMapping(path = "/delete")
-	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> deleteHolidayEvent(@RequestBody HolidayEventRequestDto HolidayEvent) {
-		HolidayRequestEvent toBeDeleted = holidayEventMapper.mapToEntity(HolidayEvent);
+	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> deleteHolidayEvent(@RequestBody HolidayEventRequestDto holidayEvent) {
+		HolidayRequestEvent toBeDeleted = holidayEventMapper.mapToEntity(holidayEvent);
 		holidayEventService.delete(toBeDeleted);
-		Email email = emailBuilder.build(toBeDeleted, "eliminato");
+		Email email = emailBuilder.build(holidayEvent, "eliminato");
 		notificator.send(email);
-		return new ResponseEntity<>(ResponseDto.<HolidayEventRequestDto>builder().data(HolidayEvent).code(HttpStatus.OK.value())
-				.description(String.format("%s eliminato", HolidayEvent.getType())).build(), HttpStatus.OK);
+		return new ResponseEntity<>(ResponseDto.<HolidayEventRequestDto>builder().data(holidayEvent).code(HttpStatus.OK.value())
+				.description(String.format("%s eliminato", holidayEvent.getType())).build(), HttpStatus.OK);
 	}
 
 	@PutMapping(path = "/update")
-	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> updateHolidayEvent(@RequestBody HolidayEventRequestDto HolidayEvent) {
-		HolidayRequestEvent toBeUpdated = holidayEventMapper.mapToEntity(HolidayEvent);
+	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> updateHolidayEvent(@RequestBody HolidayEventRequestDto holidayEvent) {
+		HolidayRequestEvent toBeUpdated = holidayEventMapper.mapToEntity(holidayEvent);
 		holidayEventService.update(toBeUpdated);
-		Email email = emailBuilder.build(toBeUpdated, "modificato");
+		Email email = emailBuilder.build(holidayEvent, "modificato");
 		notificator.send(email);
-		return new ResponseEntity<>(ResponseDto.<HolidayEventRequestDto>builder().data(HolidayEvent).code(HttpStatus.OK.value())
-				.description(String.format("%s %s aggiornato", HolidayEvent.getType(),HolidayEvent.getId())).build(), 
+		return new ResponseEntity<>(ResponseDto.<HolidayEventRequestDto>builder().data(holidayEvent).code(HttpStatus.OK.value())
+				.description(String.format("%s %s aggiornato", holidayEvent.getType(),holidayEvent.getId())).build(), 
 				HttpStatus.OK);
 	}
 	
@@ -81,7 +81,7 @@ public class HolidayEventController {
 		HolidayRequestEvent toBeApproved = holidayEventMapper.mapToEntity(holidayEvent);
 		holidayEventService.updateApprovalStatus(toBeApproved.getId(), toBeApproved.getApproved());
 		List<HolidayEvent> declinedEvents = holidayEventService.getDeclinedSingleEvents(toBeApproved.getHolidays());
-		Email email = emailBuilder.buildApproval(toBeApproved, declinedEvents);
+		Email email = emailBuilder.buildApproval(holidayEvent, declinedEvents);
 		notificator.send(email);
 		return new ResponseEntity<>(ResponseDto.<HolidayEventRequestDto>builder().data(holidayEvent).code(HttpStatus.OK.value())
 				.description(String.format("Stato di approvazione: %s", holidayEvent.getApproved())).build(), 
@@ -93,7 +93,7 @@ public class HolidayEventController {
 		List<HolidayEvent> events = holidayMapper.mapToEntityList(holidayEvent.getHolidays());
 		List<HolidayEvent> declinedEvents = holidayEventService.getDeclinedSingleEvents(events);
 		HolidayRequestEvent toBeApproved = holidayEventService.approveSingleEvent(events, holidayEvent.getId());
-		Email email = emailBuilder.buildApproval(toBeApproved, declinedEvents);
+		Email email = emailBuilder.buildApproval(holidayEventMapper.mapToDto(toBeApproved), declinedEvents);
 		notificator.send(email);
 		return new ResponseEntity<>(ResponseDto.<HolidayEventRequestDto>builder().data(holidayEventMapper.mapToDto(toBeApproved)).code(HttpStatus.OK.value())
 				.description(String.format("Stato di approvazione: %s", holidayEvent.getApproved())).build(), 
