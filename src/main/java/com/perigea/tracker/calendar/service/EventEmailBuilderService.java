@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 
 import com.perigea.tracker.calendar.configuration.ApplicationProperties;
 import com.perigea.tracker.calendar.factory.ICSFactory;
-import com.perigea.tracker.calendar.model.HolidayEvent;
 import com.perigea.tracker.commons.dto.AttachmentDto;
 import com.perigea.tracker.commons.dto.ContactDto;
 import com.perigea.tracker.commons.dto.CreatedUtenteNotificaDto;
+import com.perigea.tracker.commons.dto.HolidayEventDto;
 import com.perigea.tracker.commons.dto.HolidayEventRequestDto;
 import com.perigea.tracker.commons.dto.MeetingEventDto;
 import com.perigea.tracker.commons.dto.TimesheetEventDto;
@@ -24,6 +24,7 @@ import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.enums.EMese;
 import com.perigea.tracker.commons.enums.EmailTemplates;
 import com.perigea.tracker.commons.enums.EmailType;
+import com.perigea.tracker.commons.exception.HolidayEventException;
 import com.perigea.tracker.commons.exception.NullFieldException;
 import com.perigea.tracker.commons.exception.URIException;
 import com.perigea.tracker.commons.model.Email;
@@ -120,7 +121,6 @@ public class EventEmailBuilderService {
 		templateData.put("azione", azione);
 		templateData.put("events", event.getHolidays());
 		
-
 		return Email.builder().eventId(event.getId()).from(properties.getEmailSender()).templateName(EmailTemplates.HOLIDAY_TEMPLATE.getDescrizione())
 				.templateModel(templateData)
 				.subject(String.format("%s %s: %s", event.getEventCreator().getNome(),
@@ -150,12 +150,14 @@ public class EventEmailBuilderService {
 
 	
 		
-	public Email buildApproval(HolidayEventRequestDto event, List<HolidayEvent> list) {
+	public Email buildApproval(HolidayEventRequestDto event) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getEventCreator().getMailAziendale());
 		Map<String, Object> templateData = new HashMap<>();
-		 
+		
+		List<HolidayEventDto> declinedEvents = getDeclinedSingleEvents(event.getHolidays());
+		
 		Boolean approved = false;
 		if(event.getApproved().equals(ApprovalStatus.APPROVED)) {
 			approved = true;
@@ -164,7 +166,7 @@ public class EventEmailBuilderService {
 		templateData.put("approved", approved);
 		templateData.put("utente", event.getResponsabile().getMailAziendale());
 		templateData.put("azione", event.getApproved().toString().toLowerCase());
-		templateData.put("events", list);
+		templateData.put("events", declinedEvents);
 
 		return Email.builder().eventId(event.getId()).from(properties.getEmailSender()).templateName(EmailTemplates.APPROVAL_HOLIDAYS.getDescrizione())
 				.templateModel(templateData)
@@ -173,6 +175,8 @@ public class EventEmailBuilderService {
 						event.getApproved().toString().toLowerCase()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
+	
+	
 	
 	public Email build(CreatedUtenteNotificaDto userCredential) {
 		Map<String, Object> templateData = new HashMap<>();
@@ -220,7 +224,19 @@ public class EventEmailBuilderService {
 	
 	
 
-	
+	public List<HolidayEventDto> getDeclinedSingleEvents(List<HolidayEventDto> list) {
+		try {
+			List<HolidayEventDto> declinedSingleEvents = new ArrayList<HolidayEventDto>();
+			for (HolidayEventDto e : list) {
+				if (e.getStatus().equals(ApprovalStatus.DECLINED)) {
+					declinedSingleEvents.add(e);
+				}
+			}
+			return declinedSingleEvents;
+		} catch (Exception ex) {
+			throw new HolidayEventException(ex.getMessage());
+		}
+	}
 
 	
 //	public List<AttachmentDto> addAttachments(List<String> filePaths) {

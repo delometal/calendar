@@ -1,6 +1,5 @@
 package com.perigea.tracker.calendar.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -103,31 +102,44 @@ public class HolidayEventService {
 			throw new HolidayEventException(ex.getMessage());
 		}
 	}
-	
+
 	public HolidayRequestEvent approveSingleEvent(List<HolidayEvent> list, String id) {
-		if (repository.findById(id).isEmpty()) {
-			throw new EntityNotFoundException(id + " not found");
-		}
-		HolidayRequestEvent event = repository.findById(id).get();
-		event.setHolidays(list);
-		for(HolidayEvent e: list) {
-			if(e.getStatus().equals(ApprovalStatus.DECLINED)) {
-				event.setApproved(ApprovalStatus.DECLINED);
-				break;
+		try {
+			HolidayRequestEvent event = findById(id);
+			if (event != null) {
+				event.setHolidays(list);
+				for (HolidayEvent e : list) {
+					if (e.getStatus().equals(ApprovalStatus.DECLINED)) {
+						event.setApproved(ApprovalStatus.DECLINED);
+						break;
+					}
+				}
 			}
+			return repository.save(event);
+		} catch (Exception ex) {
+			throw new HolidayEventException(ex.getMessage());
 		}
-		return repository.save(event);
 	}
+
 	
-	public List<HolidayEvent> getDeclinedSingleEvents(List<HolidayEvent> list) {
-		List<HolidayEvent> declinedSingleEvents = new ArrayList<HolidayEvent>();
-		for(HolidayEvent e : list) {
-			if(e.getStatus().equals(ApprovalStatus.DECLINED)) {
-				declinedSingleEvents.add(e);
+	public HolidayRequestEvent deleteSingleHolidayEvents(List<HolidayEvent> list, String id) {
+		try {
+			HolidayRequestEvent event = findById(id);
+			if (event != null) {
+				for (HolidayEvent e : list) {
+					if (event.getHolidays().add(e)) {
+						event.getHolidays().remove(e);
+					}
+				}
 			}
+			return repository.save(event);
+		} catch (Exception ex) {
+			throw new HolidayEventException(ex.getMessage());
 		}
-		return declinedSingleEvents;
 	}
+		
+
+	
 //	public List<HolidayRequestEvent> findAllByDateCreatorType(Date from, Date to, String mailAziendaleCreator,
 //			CalendarEventType type) {
 //		try {
