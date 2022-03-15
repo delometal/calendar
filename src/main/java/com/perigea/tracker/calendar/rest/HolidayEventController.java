@@ -81,7 +81,7 @@ public class HolidayEventController {
 				HttpStatus.OK);
 	}
 
-	@PostMapping(path = "/approve-all")
+	@PutMapping(path = "/approve-all")
 	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> approveEvent(
 			@RequestBody HolidayEventRequestDto holidayEvent) {
 		HolidayRequestEvent toBeApproved = holidayEventMapper.mapToEntity(holidayEvent);
@@ -94,7 +94,7 @@ public class HolidayEventController {
 				HttpStatus.OK);
 	}
 
-	@PostMapping(path = "/approve-single-event")
+	@PutMapping(path = "/approve-single-event")
 	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> approveSingleEvent(
 			@RequestBody HolidayEventRequestDto holidayEvent) {
 		List<HolidayEvent> events = holidayMapper.mapToEntityList(holidayEvent.getHolidays());
@@ -119,7 +119,7 @@ public class HolidayEventController {
 				HttpStatus.OK);
 	}
 
-	@PostMapping(path = "/approve-cancel-holidays")
+	@PutMapping(path = "/approve-cancel-holidays")
 	public ResponseEntity<ResponseDto<HolidayEventRequestDto>> approveCancel(
 			@RequestBody HolidayEventRequestDto holidayEvent) {
 		List<HolidayEvent> events = holidayMapper.mapToEntityList(holidayEvent.getHolidays());
