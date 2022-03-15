@@ -1,5 +1,7 @@
 package com.perigea.tracker.calendar.rest;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +19,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.mapper.MeetingMapper;
@@ -46,7 +51,7 @@ public class MeetingEventController {
 
 	@Autowired
 	private EventEmailBuilderService emailBuilder;
-	
+
 	@Autowired
 	private NotificationRestClient notificator;
 
@@ -56,30 +61,39 @@ public class MeetingEventController {
 	@Autowired
 	private MeetingMapper mapper;
 
-	@PostMapping(path = "/create-meeting")
-	public ResponseEntity<ResponseDto<MeetingEventDto>> addMeeting(@RequestBody MeetingEventDto meetingEvent) {
+	@PostMapping(path = "/create-meeting", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE,
+			MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<ResponseDto<MeetingEventDto>> addMeeting(@RequestPart("event") MeetingEventDto meetingEvent,
+			@RequestParam("files") MultipartFile[] files) throws IllegalStateException, IOException {
+
+		List<File> filesList = Utils.getFileList(files);
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
-		Email email = emailBuilder.build(meetingEvent, "creato");		
-		Date notificationDate = Utils.shiftTime(Utils.convertToDateViaInstant(event.getStartDate()), event.getReminderTime().getMinuti());
+		Email email = emailBuilder.build(meetingEvent, "creato", filesList);
+		Date notificationDate = Utils.shiftTime(Utils.convertToDateViaInstant(event.getStartDate()),
+				event.getReminderTime().getMinuti());
 
 		meetingService.save(event);
-	
+
 		notificator.send(email);
 		schedulerService.scheduleNotifica(notificationDate, emailBuilder.buildReminder(meetingEvent));
 		return new ResponseEntity<>(ResponseDto.<MeetingEventDto>builder().data(meetingEvent)
 				.code(HttpStatus.OK.value()).description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}
 
-	@PostMapping(path = "/create-periodic-meeting")
-	public ResponseEntity<ResponseDto<MeetingEventDto>> addPeriodicMeeting(@RequestBody MeetingEventDto meetingEvent,
-			@RequestParam LocalDateTime expiration, @RequestParam String cron) {
+	@PostMapping(path = "/create-periodic-meeting",  consumes = { MediaType.MULTIPART_FORM_DATA_VALUE,
+			MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<ResponseDto<MeetingEventDto>> addPeriodicMeeting(
+			@RequestPart("event") MeetingEventDto meetingEvent, @RequestParam("files") MultipartFile[] files,
+			@RequestParam LocalDateTime expiration, @RequestParam String cron)
+			throws IllegalStateException, IOException {
+		List<File> filesList = Utils.getFileList(files);
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
-		Email email = emailBuilder.build(meetingEvent, "creato");
-		
+		Email email = emailBuilder.build(meetingEvent, "creato", filesList);
+
 		Date expirationDate = Utils.convertToDateViaInstant(expiration);
-		
+
 		meetingService.save(event);
 		notificator.send(email);
 		schedulerService.scheduleNotificaPeriodica(cron, emailBuilder.buildReminder(meetingEvent), expirationDate);
@@ -87,11 +101,16 @@ public class MeetingEventController {
 				.code(HttpStatus.OK.value()).description("Meeting inserito nel calendario").build(), HttpStatus.OK);
 	}
 
-	@PutMapping(path = "/update-meeting")
-	public ResponseEntity<ResponseDto<MeetingEventDto>> updateMeeting(@RequestBody MeetingEventDto meetingEvent) {
+	@PutMapping(path = "/update-meeting",  consumes = { MediaType.MULTIPART_FORM_DATA_VALUE,
+			MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<ResponseDto<MeetingEventDto>> updateMeeting(
+			@RequestPart("event") MeetingEventDto meetingEvent, @RequestParam("files") MultipartFile[] files) {
+		List<File> filesList = Utils.getFileList(files);
+
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
-		Email email = emailBuilder.build(meetingEvent, "modificato");
-		Date notificationDate = Utils.shiftTime(Utils.convertToDateViaInstant(event.getStartDate()), event.getReminderTime().getMinuti());
+		Email email = emailBuilder.build(meetingEvent, "modificato", filesList);
+		Date notificationDate = Utils.shiftTime(Utils.convertToDateViaInstant(event.getStartDate()),
+				event.getReminderTime().getMinuti());
 
 		meetingService.update(event);
 		notificator.send(email);
@@ -100,12 +119,15 @@ public class MeetingEventController {
 				.code(HttpStatus.OK.value()).description("Meeting aggiornato nel calendario").build(), HttpStatus.OK);
 	}
 
-	@DeleteMapping(path = "/delete-meeting")
-	public ResponseEntity<ResponseDto<String>> deleteMeeting(@RequestBody MeetingEventDto toBeDeleted,
-			@RequestBody List<String> filePath) {
+	@DeleteMapping(path = "/delete-meeting",  consumes = { MediaType.MULTIPART_FORM_DATA_VALUE,
+			MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<ResponseDto<String>> deleteMeeting(@RequestPart("event") MeetingEventDto toBeDeleted,
+			@RequestParam("files") MultipartFile[] files, @RequestBody List<String> filePath) {
+		List<File> filesList = Utils.getFileList(files);
+
 		MeetingEvent event = mapper.mapToEntity(toBeDeleted);
 		meetingService.delete(event);
-		Email email = emailBuilder.build(toBeDeleted, "eliminato");
+		Email email = emailBuilder.build(toBeDeleted, "eliminato", filesList);
 		notificator.send(email);
 		boolean deleted = schedulerService.disactiveNotification(toBeDeleted.getId());
 		return new ResponseEntity<>(ResponseDto.<String>builder().data(deleted ? "OK" : "Error")
@@ -122,8 +144,7 @@ public class MeetingEventController {
 	}
 
 	@GetMapping(path = "/get-meetings-in-date-range/{from}/{to}")
-	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRange(
-			@PathVariable LocalDateTime from,
+	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRange(@PathVariable LocalDateTime from,
 			@PathVariable LocalDateTime to) {
 
 		List<MeetingEvent> events = meetingService.getEventsBetween(from, to);
@@ -135,9 +156,7 @@ public class MeetingEventController {
 
 	@GetMapping(path = "/all-by-range-and-creator/{from}/{to}/{mailCreator}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllInDateRangeByCreator(
-			@PathVariable LocalDateTime from,
-			@PathVariable LocalDateTime to,
-			@PathVariable String mailCreator) {
+			@PathVariable LocalDateTime from, @PathVariable LocalDateTime to, @PathVariable String mailCreator) {
 
 		List<MeetingEvent> events = meetingService.getEventsBetweenByCreator(from, to, mailCreator);
 		List<MeetingEventDto> meetings = mapper.mapToDtoList(events);
@@ -149,8 +168,7 @@ public class MeetingEventController {
 	}
 
 	@GetMapping(path = "/room-availability-in-range/{from}/{to}")
-	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(
-			@PathVariable LocalDateTime from,
+	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(@PathVariable LocalDateTime from,
 			@PathVariable LocalDateTime to) {
 		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(from, to))
 				.description(String.format("Disponibiltà sala riunioni da %s a %s", from.toString(), to.toString()))
@@ -158,8 +176,7 @@ public class MeetingEventController {
 	}
 
 	@GetMapping(path = "/room-availability/{instant}")
-	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(
-			@PathVariable LocalDateTime instant) {
+	public ResponseEntity<ResponseDto<Boolean>> checkAvailability(@PathVariable LocalDateTime instant) {
 
 		return new ResponseEntity<>(ResponseDto.<Boolean>builder().data(roomService.isFree(instant))
 				.description(String.format("Disponibiltà sala riunioni in data %s", instant.toString()))
@@ -168,8 +185,7 @@ public class MeetingEventController {
 
 	@GetMapping(path = "/all-dates-meetings-reserved/{startDate}/{endDate}")
 	public ResponseEntity<ResponseDto<List<MeetingEventReserved>>> getAllDatesMeetingsReserved(
-			@PathVariable  LocalDateTime startDate,
-			@PathVariable  LocalDateTime endDate) {
+			@PathVariable LocalDateTime startDate, @PathVariable LocalDateTime endDate) {
 
 		List<MeetingEvent> meetingsEvents = meetingEventRepository.blockingMeetingsInRange(startDate, endDate);
 		List<MeetingEventReserved> meetingsReserved = meetingsEvents.stream()
@@ -181,14 +197,13 @@ public class MeetingEventController {
 						.description("Lista date sala riunioni occupata").code(HttpStatus.OK.value()).build(),
 				HttpStatus.OK);
 	}
-	
+
 	@GetMapping(path = "/all-meetings-reserved/{startDate}/{endDate}")
 	public ResponseEntity<ResponseDto<List<MeetingEventDto>>> getAllMeetingsReserved(
-			@PathVariable  LocalDateTime startDate,
-			@PathVariable  LocalDateTime endDate) {
+			@PathVariable LocalDateTime startDate, @PathVariable LocalDateTime endDate) {
 
 		List<MeetingEvent> meetingsEvents = meetingEventRepository.blockingMeetingsInRange(startDate, endDate);
-		
+
 		return new ResponseEntity<>(
 				ResponseDto.<List<MeetingEventDto>>builder().data(mapper.mapToDtoList(meetingsEvents))
 						.description("Lista date sala riunioni occupata").code(HttpStatus.OK.value()).build(),

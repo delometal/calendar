@@ -1,5 +1,6 @@
 package com.perigea.tracker.calendar.service;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public class EventEmailBuilderService {
 	private ApplicationProperties properties;
 	
 
-	public Email build(MeetingEventDto event, String azione) {
+	public Email build(MeetingEventDto event, String azione, List<File> files) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipients = new ArrayList<>();
 		Map<String, Object> templateData = new HashMap<>();
@@ -54,8 +55,11 @@ public class EventEmailBuilderService {
 		for (ContactDto c : event.getParticipants()) {
 			recipients.add(c.getMailAziendale());
 		}
-		//attachments = addAttachments(list);
+		
+		attachments = addAttachments(files);
 		attachments.add(addICSFile(event));
+		
+		
 		templateData.put("creator",
 		String.format("%s %s", event.getEventCreator().getNome(), event.getEventCreator().getCognome()));
 		templateData.put("eventType", event.getType());
@@ -66,7 +70,7 @@ public class EventEmailBuilderService {
 		templateData.put("presenza", event.getInPerson().booleanValue());
 		
 		return Email.builder().eventId(event.getId()).from(properties.getEmailSender()).templateName(EmailTemplates.MEETING_TEMPLATE.getDescrizione())
-				.templateModel(templateData).subject(String.format("%s: %s", event.getType(), event.getDescription()))
+				.templateModel(templateData).subject(String.format("%s - %s", event.getType(), event.getDescription()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).attachments(attachments).build();
 	}
 
@@ -218,7 +222,8 @@ public class EventEmailBuilderService {
 	public AttachmentDto addICSFile(MeetingEventDto event) {
 		AttachmentDto attch = new AttachmentDto();
 		attch.setBArray(ICSFactory.createICS(event));
-		attch.setFileName("text/calendar");
+		attch.setMIMEType("text/calendar");
+		attch.setFilename("meeting.ics");
 		return attch;
 	}
 	
@@ -239,20 +244,24 @@ public class EventEmailBuilderService {
 	}
 
 	
-//	public List<AttachmentDto> addAttachments(List<String> filePaths) {
-//		List<AttachmentDto> attachments = new ArrayList<AttachmentDto>();
-//		filePaths.stream().forEach(path -> {
-//			byte[] bArray = Utils.convertFileToByteArray(path);
-//			String[] pathPart = path.split("\\.");
-//			int lenght = pathPart.length;
-//			String MIMEType = Utils.getMIMEType(pathPart[lenght-1]);
-//			AttachmentDto attch = new AttachmentDto();
-//			attch.setFileName(MIMEType);
-//			attch.setBArray(bArray);
-//			attachments.add(attch);
-//		});
-//		return attachments;
-//	}
+	public List<AttachmentDto> addAttachments(List<File> files) {
+		List<AttachmentDto> attachments = new ArrayList<AttachmentDto>();
+		files.stream().forEach(file -> {
+			String path = file.getPath();
+			byte[] bArray = Utils.convertFileToByteArray(file);
+			String[] pathPart = path.split("\\.");
+			String[] pathFinalPart = path.split("\\\\");
+			int lenght = pathPart.length;
+			String MIMEType = Utils.getMIMEType(pathPart[lenght-1]);
+			String filename = pathFinalPart[pathFinalPart.length-1];
+			AttachmentDto attch = new AttachmentDto();
+			attch.setMIMEType(MIMEType);
+			attch.setFilename(filename);
+			attch.setBArray(bArray);
+			attachments.add(attch);
+		});
+		return attachments;
+	}
 	
 	
 
