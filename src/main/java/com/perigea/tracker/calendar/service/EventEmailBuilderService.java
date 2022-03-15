@@ -54,12 +54,13 @@ public class EventEmailBuilderService {
 			recipients.add(c.getMailAziendale());
 		}
 
+		attachments.add(addICSFile(event));
+
 		if (files.size() > 2) {
 			AttachmentDto attachment = buildZipAttachment(files);
 			attachments.add(attachment);
 		} else {
 			attachments = addAttachments(files);
-			attachments.add(addICSFile(event));
 		}
 
 		templateData.put("creator",
@@ -259,7 +260,6 @@ public class EventEmailBuilderService {
 		return attachments;
 	}
 
-	// Building per lo zip
 	public AttachmentDto buildZipAttachment(List<File> files) {
 
 		AttachmentDto attachmentZip = new AttachmentDto();
