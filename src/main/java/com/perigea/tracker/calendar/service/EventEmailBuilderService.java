@@ -40,7 +40,14 @@ public class EventEmailBuilderService {
 
 	@Autowired
 	private ApplicationProperties properties;
-
+	
+	/**
+	 * metodo per la creazione di un email relativa ad un meeting
+	 * @param event
+	 * @param azione
+	 * @param files
+	 * @return
+	 */
 	public Email build(MeetingEventDto event, String azione, List<File> files) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipients = new ArrayList<>();
@@ -77,7 +84,12 @@ public class EventEmailBuilderService {
 				.subject(String.format("%s - %s", event.getType(), event.getDescription()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).attachments(attachments).build();
 	}
-
+	
+	/**
+	 * creazione di un email per il reminder di un meeting
+	 * @param event
+	 * @return
+	 */
 	public Email buildReminder(MeetingEventDto event) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipients = new ArrayList<>();
@@ -101,7 +113,13 @@ public class EventEmailBuilderService {
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).attachments(attachments).build();
 
 	}
-
+	
+	/**
+	 * creazione di un email per la richiesta di approvazione di un timesheet
+	 * @param event
+	 * @param azione
+	 * @return
+	 */
 	public Email build(TimesheetEventDto event, String azione) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		EMese mese = EMese.getByMonthId(event.getTimesheet().getMese());
@@ -120,7 +138,13 @@ public class EventEmailBuilderService {
 						event.getEventCreator().getCognome(), event.getType()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
-
+	
+	/**
+	 * creazione di un email per la richiesta di approvazione di ferie/permessi
+	 * @param event
+	 * @param azione
+	 * @return
+	 */
 	public Email build(HolidayEventRequestDto event, String azione) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
@@ -136,7 +160,12 @@ public class EventEmailBuilderService {
 						event.getEventCreator().getCognome(), event.getType()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
-
+	
+	/**
+	 * creazione email per l'approvazione di un timesheet
+	 * @param event
+	 * @return
+	 */
 	public Email buildApproval(TimesheetEventDto event) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		EMese mese = EMese.getByMonthId(event.getTimesheet().getMese());
@@ -156,7 +185,12 @@ public class EventEmailBuilderService {
 						event.getApprovalStatus().toString().toLowerCase()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
-
+	
+	/**
+	 * email per l'approvazione di ferie/permessi
+	 * @param event
+	 * @return
+	 */
 	public Email buildApproval(HolidayEventRequestDto event) {
 		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
@@ -182,7 +216,12 @@ public class EventEmailBuilderService {
 						event.getApproved().toString().toLowerCase()))
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
-
+	
+	/**
+	 * creazione email per le credenziali di un utente
+	 * @param userCredential
+	 * @return
+	 */
 	public Email build(CreatedUtenteNotificaDto userCredential) {
 		Map<String, Object> templateData = new HashMap<>();
 		List<String> recipients = new ArrayList<>();
@@ -202,7 +241,12 @@ public class EventEmailBuilderService {
 				.templateName(EmailTemplates.CREATE_CREDENTIAL_TEMPLATE.getDescrizione()).templateModel(templateData)
 				.subject("Attivazione credenziali").emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).build();
 	}
-
+	
+	/**
+	 * email per il reminder per l'aggiornamento delle credenziali di un utente
+	 * @param data
+	 * @return
+	 */
 	public Email buildReminder(CreatedUtenteNotificaDto data) {
 		List<String> recipients = new ArrayList<>();
 		Map<String, Object> templateData = new HashMap<>();
@@ -218,7 +262,12 @@ public class EventEmailBuilderService {
 				.templateName(EmailTemplates.REMINDER_CREDENTIAL_TEMPLATE.getDescrizione()).templateModel(templateData)
 				.subject("Attivazione credenziali").emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).build();
 	}
-
+	
+	/**
+	 * metodo per l'aggiunta di un file ICS negli allegati
+	 * @param event
+	 * @return
+	 */
 	public AttachmentDto addICSFile(MeetingEventDto event) {
 		AttachmentDto attch = new AttachmentDto();
 		attch.setBArray(ICSFactory.createICS(event));
@@ -226,7 +275,12 @@ public class EventEmailBuilderService {
 		attch.setFilename("meeting.ics");
 		return attch;
 	}
-
+	
+	/**
+	 * metodo per la lettura di ferie/permessi non approvati
+	 * @param list
+	 * @return
+	 */
 	public List<HolidayEventDto> getDeclinedSingleEvents(List<HolidayEventDto> list) {
 		try {
 			List<HolidayEventDto> declinedSingleEvents = new ArrayList<HolidayEventDto>();
@@ -240,7 +294,12 @@ public class EventEmailBuilderService {
 			throw new HolidayEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * metodo per l'aggiunta di n file come allegati
+	 * @param files
+	 * @return
+	 */
 	public List<AttachmentDto> addAttachments(List<File> files) {
 		List<AttachmentDto> attachments = new ArrayList<AttachmentDto>();
 		files.stream().forEach(file -> {
@@ -259,7 +318,12 @@ public class EventEmailBuilderService {
 		});
 		return attachments;
 	}
-
+	
+	/**
+	 * metodo per l'aggiunta di un file zip come allegato
+	 * @param files
+	 * @return
+	 */
 	public AttachmentDto buildZipAttachment(List<File> files) {
 
 		AttachmentDto attachmentZip = new AttachmentDto();

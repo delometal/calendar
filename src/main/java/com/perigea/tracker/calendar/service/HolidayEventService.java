@@ -24,19 +24,31 @@ public class HolidayEventService {
 
 	@Autowired
 	private Logger logger;
-
+	
+	/**
+	 * creazione di un evento di tipo ferie/permessi
+	 * @param event
+	 */
 	public void save(HolidayRequestEvent event) {
 		repository.save(event);
 		logger.info(String.format("%s aggiunto in persistenza", event.getType()));
 
 	}
-
+	
+	/**
+	 * delete di un evento di tipo ferie/permessi
+	 * @param event
+	 */
 	public void delete(HolidayRequestEvent event) {
 		repository.delete(event);
 		logger.info(String.format("%s rimosso", event.getType()));
 
 	}
-
+	
+	/**
+	 * update di un evento di tipo ferie/permessi
+	 * @param event
+	 */
 	public void update(HolidayRequestEvent event) {
 		if (repository.findById(event.getId()).isEmpty()) {
 			throw new EntityNotFoundException(event.getId() + " not found");
@@ -44,7 +56,12 @@ public class HolidayEventService {
 
 		repository.save(event);
 	}
-
+	
+	/**
+	 * lettura di tutti eventi di tipo ferie/permessi in base al richiedente
+	 * @param mailAziendaleCreator
+	 * @return
+	 */
 	public List<HolidayRequestEvent> findAllByEventCreator(String mailAziendaleCreator) {
 		try {
 			return repository.findAllByEventCreator(mailAziendaleCreator);
@@ -55,7 +72,12 @@ public class HolidayEventService {
 			throw new HolidayEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * lettura di tutti eventi di tipo ferie/permessi in base al responsabile che li deve approvare
+	 * @param mailAziendaleResponsabile
+	 * @return
+	 */
 	public List<HolidayRequestEvent> findAllByResponsabile(String mailAziendaleResponsabile) {
 		try {
 			return repository.findByResponsabile(mailAziendaleResponsabile);
@@ -66,7 +88,12 @@ public class HolidayEventService {
 			throw new HolidayEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * lettura di tutti gli eventi in base al tipo 
+	 * @param type
+	 * @return
+	 */
 	public List<HolidayRequestEvent> findAllByType(CalendarEventType type) {
 		try {
 			return repository.findAllByType(type);
@@ -74,7 +101,13 @@ public class HolidayEventService {
 			throw new HolidayEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * update dello status complessivo
+	 * @param ID
+	 * @param status
+	 * @return
+	 */
 	public HolidayRequestEvent updateApprovalStatus(String ID, ApprovalStatus status) {
 		try {
 			HolidayRequestEvent event = findById(ID);
@@ -90,7 +123,12 @@ public class HolidayEventService {
 			throw new HolidayEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * lettura di un evento di tipo ferie/permessi
+	 * @param leaveId
+	 * @return
+	 */
 	public HolidayRequestEvent findById(String leaveId) {
 		try {
 			Optional<HolidayRequestEvent> optionalEvent = repository.findById(leaveId);
@@ -102,7 +140,13 @@ public class HolidayEventService {
 			throw new HolidayEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * metodo di approvazione dei singoli giorni di ferie/permesso
+	 * @param list
+	 * @param id
+	 * @return
+	 */
 	public HolidayRequestEvent approveSingleEvent(List<HolidayEvent> list, String id) {
 		try {
 			HolidayRequestEvent event = findById(id);
@@ -121,7 +165,12 @@ public class HolidayEventService {
 		}
 	}
 
-	
+	/**
+	 * delete dei singoli giorni di ferie/permesso
+	 * @param list
+	 * @param id
+	 * @return
+	 */
 	public HolidayRequestEvent deleteSingleHolidayEvents(List<HolidayEvent> list, String id) {
 		try {
 			HolidayRequestEvent event = findById(id);

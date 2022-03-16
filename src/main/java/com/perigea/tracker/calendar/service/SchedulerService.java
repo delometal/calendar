@@ -35,7 +35,13 @@ public class SchedulerService {
 
 	@Autowired
 	private ScheduledEventRepositoryService repositoryService;
-
+	
+	/**
+	 * schedulazione di una notifica istantanea 
+	 * @param dataEsecuzione
+	 * @param email
+	 * @return
+	 */
 	public ScheduledEvent scheduleNotifica(Date dataEsecuzione, Email email) {
 		JobDetail detail = buildJobDetail(email, TipoScheduleEvent.ISTANTANEA.toString());
 		Trigger trigger = buildJobTrigger(detail, dataEsecuzione);
@@ -52,7 +58,14 @@ public class SchedulerService {
 		repositoryService.save(info);
 		return info;
 	}
-
+	
+	/**
+	 * schedulazione di una notifica periodica
+	 * @param cron
+	 * @param email
+	 * @param expiration
+	 * @return
+	 */
 	public ScheduledEvent scheduleNotificaPeriodica(String cron, Email email, Date expiration) {
 		JobDetail detail = buildJobDetailPeriodic(email, TipoScheduleEvent.PERIODICO.toString(), expiration);
 		Trigger trigger = buildCronJobTrigger(detail, cron);
@@ -69,7 +82,12 @@ public class SchedulerService {
 		repositoryService.save(info);
 		return info;
 	}
-
+	
+	/**
+	 * metodo per mettere in pausa una schedulazione 
+	 * @param id
+	 * @return
+	 */
 	public String pauseNotification(String id) {
 		try {
 			JobKey key = new JobKey(id, "calendar");
@@ -83,7 +101,12 @@ public class SchedulerService {
 		}
 
 	}
-
+	
+	/**
+	 * metodo per riattivare una schedulazione in pausa
+	 * @param id
+	 * @return
+	 */
 	public ScheduledEvent resumeNotification(String id) {
 		try {
 			ScheduledEvent event = repositoryService.getByStatusAndId(EventStatus.Paused, id);
@@ -99,7 +122,12 @@ public class SchedulerService {
 			throw new NotificationSchedulerException(e.getMessage());
 		}
 	}
-
+	
+	/**
+	 * metodo per disattivare una schedulazione
+	 * @param id
+	 * @return
+	 */
 	public boolean disactiveNotification(String id) {
 		try {
 			JobKey key = new JobKey(id, "calendar");
@@ -112,7 +140,14 @@ public class SchedulerService {
 			throw new NotificationSchedulerException(e.getMessage());
 		}
 	}
-
+	
+	/**
+	 * metodo per la rischedulazione di un evento istantaneo
+	 * @param nuovaData
+	 * @param id
+	 * @param email
+	 * @return
+	 */
 	public ScheduledEvent reschedule(Date nuovaData, String id, Email email) {
 
 		JobDetail detail = buildJobDetail(email, repositoryService.getById(id).getTipo());
@@ -134,7 +169,13 @@ public class SchedulerService {
 			throw new NotificationSchedulerException(e.getMessage());
 		}
 	}
-
+	
+	/**
+	 * motodo per la rischedulazione di un evento di tipo periodico
+	 * @param cron
+	 * @param id
+	 * @return
+	 */
 	public ScheduledEvent reschedule(String cron, String id) {
 		JobKey jobKey = new JobKey(id, "calendar");
 		try {
@@ -157,7 +198,10 @@ public class SchedulerService {
 			throw new NotificationSchedulerException(e.getMessage());
 		}
 	}
-
+	
+	/**
+	 * metodo per la rischedulazione di tutti gli eventi attivi al riavvio della macchina
+	 */
 	public void rescheduleAvvio() {
 		List<ScheduledEvent> infos = repositoryService.getAllByStatus(EventStatus.Active);
 		repositoryService.deleteAll(infos);
@@ -182,11 +226,21 @@ public class SchedulerService {
 
 		}
 	}
-
+	
+	/**
+	 * lettura di tutti gli eventi schedulati
+	 * @return
+	 */
 	public List<ScheduledEvent> getAll() {
 		return repositoryService.getAll();
 	}
-
+	
+	/**
+	 * creazione di un job
+	 * @param email
+	 * @param type
+	 * @return
+	 */
 	private JobDetail buildJobDetail(Email email, String type) {
 		JobDataMap dataMap = new JobDataMap();
 		dataMap.put("email", email);
@@ -194,7 +248,14 @@ public class SchedulerService {
 		return JobBuilder.newJob(NotificationJob.class).withIdentity(email.getEventId(), "calendar")
 				.usingJobData(dataMap).withDescription("Job scheduler for notification").build();
 	}
-
+	
+	/**
+	 * creazione di un job temporaneo
+	 * @param email
+	 * @param type
+	 * @param expiration
+	 * @return
+	 */
 	private JobDetail buildJobDetailPeriodic(Email email, String type, Date expiration) {
 		JobDataMap dataMap = new JobDataMap();
 		dataMap.put("email", email);
@@ -203,7 +264,7 @@ public class SchedulerService {
 		return JobBuilder.newJob(NotificationJob.class).withIdentity(email.getEventId(), "calendar")
 				.usingJobData(dataMap).withDescription("Job scheduler for notification").build();
 	}
-
+	
 	private Trigger buildJobTrigger(JobDetail detail, Date dataEsecuzione) {
 		return buildJobTrigger(detail, dataEsecuzione, detail.getKey().getName());
 	}

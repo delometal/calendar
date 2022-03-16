@@ -23,19 +23,31 @@ public class TimesheetEventService {
 
 	@Autowired
 	private TimesheetEventRepository timesheetRepository;
-
+	
+	/**
+	 * create 
+	 * @param event
+	 */
 	public void save(TimesheetEvent event) {
 		timesheetRepository.save(event);
 		logger.info(String.format("%s aggiunto in persistenza", event.getType()));
 
 	}
-
+	
+	/**
+	 * delete
+	 * @param event
+	 */
 	public void delete(TimesheetEvent event) {
 		timesheetRepository.delete(event);
 		logger.info(String.format("%s rimosso", event.getType()));
 
 	}
-
+	
+	/**
+	 * update
+	 * @param event
+	 */
 	public void update(TimesheetEvent event) {
 		if (timesheetRepository.findById(event.getId()).isEmpty()) {
 			throw new EntityNotFoundException(event.getId() + " not found");
@@ -43,7 +55,12 @@ public class TimesheetEventService {
 		System.out.println(timesheetRepository.findById(event.getId()));
 		timesheetRepository.save(event);
 	}
-
+	
+	/**
+	 * lettura di tutti gli eventi in base al creator
+	 * @param mailAziendaleCreator
+	 * @return
+	 */
 	public List<TimesheetEvent> findAllByEventCreator(String mailAziendaleCreator) {
 		try {
 			return timesheetRepository.findAllByEventCreator(mailAziendaleCreator);
@@ -54,7 +71,13 @@ public class TimesheetEventService {
 			throw new TimesheetEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * aggiornamento dello stato di approvazione di un timesheet
+	 * @param ID
+	 * @param status
+	 * @return
+	 */
 	public TimesheetEvent updateApprovalStatus(String ID, ApprovalStatus status) {
 		try {
 			TimesheetEvent event = findById(ID);
@@ -66,7 +89,12 @@ public class TimesheetEventService {
 			throw new HolidayEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * lettura di un evento in base all'id
+	 * @param ID
+	 * @return
+	 */
 	public TimesheetEvent findById(String ID) {
 		try {
 			Optional<TimesheetEvent> optionalEvent = timesheetRepository.findById(ID);

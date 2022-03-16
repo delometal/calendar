@@ -21,7 +21,10 @@ public class ArchivingService {
 
 	@Autowired
 	private ArchivedEventRepository archivedRepo;
-
+	
+	/**
+	 * metodo per l'archiviazione di eventi in precedenza schedulati ed ora inattivi
+	 */
 	@Scheduled(cron = "* 0 0 1 1 *")
 	public void archiveInactiveScheduleEvent() {
 		List<ScheduledEvent> inactiveScheduledEvents = repositoryService.getAllByStatus(EventStatus.Inactive);

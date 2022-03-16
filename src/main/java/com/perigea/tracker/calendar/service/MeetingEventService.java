@@ -26,7 +26,11 @@ public class MeetingEventService {
 
 	@Autowired
 	private Logger logger;
-
+	
+	/**
+	 * creazione di un meeting
+	 * @param event
+	 */
 	public void save(MeetingEvent event) {
 		if(isReserved(event)) {
 			throw new MeetingRoomReservedException("Stanza nel periodo indicato non disponibile!");
@@ -35,12 +39,20 @@ public class MeetingEventService {
 		logger.info(String.format("Evento %s aggiunto in persistenza", event.getId()));
 
 	}
-
+	
+	/**
+	 * delete di un meeting
+	 * @param event
+	 */
 	public void delete(MeetingEvent event) {
 		repository.delete(event);
 		logger.info(String.format("Evento %s cancellato", event.getId()));
 	}
 	
+	/**
+	 * update di un meeting
+	 * @param event
+	 */
 	public void update(MeetingEvent event) {
 		if (findById(event.getId()) == null){
 			throw new EntityNotFoundException(event.getId() + " not found");
@@ -49,7 +61,12 @@ public class MeetingEventService {
 		repository.save(event);
 	}
 	
-	
+	/**
+	 * lettura di tutti i meeting tra due date
+	 * @param from
+	 * @param to
+	 * @return
+	 */
 	public List<MeetingEvent> getEventsBetween(LocalDateTime from, LocalDateTime to) {
 		try {
 			List<MeetingEvent> events = repository.findAllByStartDateBetween(from, to);
@@ -58,7 +75,11 @@ public class MeetingEventService {
 			throw new MeetingEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * lettura di tutti i meeting
+	 * @return
+	 */
 	public List<MeetingEvent> findAll() {
 		try {
 			return repository.findAll();
@@ -66,7 +87,12 @@ public class MeetingEventService {
 			throw new MeetingEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * lettura di tutti i meeting in base al creator
+	 * @param eventCreator
+	 * @return
+	 */
 	public List<MeetingEvent> findAllByCreator(String eventCreator) {
 		try {
 			return repository.findAllByEventCreator(eventCreator);
@@ -77,7 +103,14 @@ public class MeetingEventService {
 			throw new MeetingEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * lettura di tutti i meeting in base al creator e tra 2 date
+	 * @param from
+	 * @param to
+	 * @param mailAziendaleCreator
+	 * @return
+	 */
 	public List<MeetingEvent> getEventsBetweenByCreator(LocalDateTime from, LocalDateTime to, String mailAziendaleCreator) {
 		try {
 			return repository.findAllByStartDateBetweenByCreator(from, to, mailAziendaleCreator);
@@ -88,7 +121,12 @@ public class MeetingEventService {
 			throw new MeetingEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * lettura di un meeting in base all'id
+	 * @param meetingId
+	 * @return
+	 */
 	public MeetingEvent findById(String meetingId) {
 		try {
 			Optional<MeetingEvent> optionalEvent = repository.findById(meetingId);
@@ -100,15 +138,34 @@ public class MeetingEventService {
 			throw new MeetingEventException(ex.getMessage());
 		}
 	}
-
+	
+	/**
+	 * metodo per l'accettazione dell'invito di partecipazione ad un meeting
+	 * @param meetingId
+	 * @param participantId
+	 * @return
+	 */
 	public boolean acceptInvite(String meetingId, String participantId) {
 		return changeInviteStatus(meetingId, participantId, ParticipationStatus.Confermata);
 	}
-
+	
+	/**
+	 * metodo per il rifiuto dell'invito di partecipazione ad un meeting
+	 * @param meetingId
+	 * @param participantId
+	 * @return
+	 */
 	public boolean declineInvite(String meetingId, String participantId) {
 		return changeInviteStatus(meetingId, participantId, ParticipationStatus.Non_confermata);
 	}
-
+	
+	/**
+	 * aggiornamento dello status di partecipazione ad un evento
+	 * @param meetingId
+	 * @param participantId
+	 * @param status
+	 * @return
+	 */
 	private boolean changeInviteStatus(String meetingId, String participantId, ParticipationStatus status) {
 		MeetingEvent event = findById(meetingId);
 		if (event == null) {
@@ -132,8 +189,12 @@ public class MeetingEventService {
 		logger.info(String.format("Evento %s aggiornato", event.getId()));
 		return true;
 	}
-	
-
+		
+	/**
+	 * metodo per il controllo della disponibilità della sala riunioni
+	 * @param event
+	 * @return
+	 */
 	private boolean isReserved(MeetingEvent event) {
 		
 		LocalDateTime startDate = Utils.shiftLocalDateTime(event.getStartDate(), -1);
