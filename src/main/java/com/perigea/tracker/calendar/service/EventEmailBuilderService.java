@@ -49,7 +49,6 @@ public class EventEmailBuilderService {
 	 * @return
 	 */
 	public Email build(MeetingEventDto event, String azione, List<File> files) {
-		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipients = new ArrayList<>();
 		Map<String, Object> templateData = new HashMap<>();
 		List<AttachmentDto> attachments = new ArrayList<AttachmentDto>();
@@ -70,11 +69,10 @@ public class EventEmailBuilderService {
 			attachments = addAttachments(files);
 		}
 
-		templateData.put("creator",
-				String.format("%s %s", event.getEventCreator().getNome(), event.getEventCreator().getCognome()));
+		templateData.put("creator", String.format("%s %s", event.getEventCreator().getNome(), event.getEventCreator().getCognome()));
 		templateData.put("eventType", event.getType());
-		templateData.put("dataInizio", Utils.formatDate(event.getStartDate()));
-		templateData.put("dataFine", Utils.formatDate(event.getEndDate()));
+		templateData.put("dataInizio", Utils.formatDate(event.getStartDate(), TimeZone.getTimeZone("ECT").toZoneId()));
+		templateData.put("dataFine", Utils.formatDate(event.getEndDate(), TimeZone.getTimeZone("ECT").toZoneId()));
 		templateData.put("partecipanti", recipients);
 		templateData.put("azione", azione);
 		templateData.put("presenza", event.getInPerson().booleanValue());
@@ -91,7 +89,6 @@ public class EventEmailBuilderService {
 	 * @return
 	 */
 	public Email buildReminder(MeetingEventDto event) {
-		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipients = new ArrayList<>();
 		for (ContactDto c : event.getParticipants()) {
 			recipients.add(c.getMailAziendale());
@@ -101,10 +98,9 @@ public class EventEmailBuilderService {
 		attachments.add(addICSFile(event));
 
 		Map<String, Object> templateData = new HashMap<>();
-		templateData.put("creator",
-				String.format("%s %s", event.getEventCreator().getNome(), event.getEventCreator().getCognome()));
+		templateData.put("creator", String.format("%s %s", event.getEventCreator().getNome(), event.getEventCreator().getCognome()));
 		templateData.put("eventType", event.getType());
-		templateData.put("dataInizio", Utils.formatDate(event.getStartDate()));
+		templateData.put("dataInizio", Utils.formatDate(event.getStartDate(), TimeZone.getTimeZone("ECT").toZoneId()));
 		templateData.put("partecipanti", recipients);
 
 		return Email.builder().eventId(event.getId()).from(properties.getEmailSender())
@@ -121,7 +117,6 @@ public class EventEmailBuilderService {
 	 * @return
 	 */
 	public Email build(TimesheetEventDto event, String azione) {
-		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		EMese mese = EMese.getByMonthId(event.getTimesheet().getMese());
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getResponsabile().getMailAziendale());
@@ -146,7 +141,6 @@ public class EventEmailBuilderService {
 	 * @return
 	 */
 	public Email build(HolidayEventRequestDto event, String azione) {
-		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getResponsabile().getMailAziendale());
 		Map<String, Object> templateData = new HashMap<>();
@@ -167,7 +161,6 @@ public class EventEmailBuilderService {
 	 * @return
 	 */
 	public Email buildApproval(TimesheetEventDto event) {
-		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		EMese mese = EMese.getByMonthId(event.getTimesheet().getMese());
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getEventCreator().getMailAziendale());
@@ -192,7 +185,6 @@ public class EventEmailBuilderService {
 	 * @return
 	 */
 	public Email buildApproval(HolidayEventRequestDto event) {
-		Utils.DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("ECT"));
 		List<String> recipient = new ArrayList<>();
 		recipient.add(event.getEventCreator().getMailAziendale());
 		Map<String, Object> templateData = new HashMap<>();
