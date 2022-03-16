@@ -37,7 +37,9 @@ import com.perigea.tracker.commons.utils.Utils;
 // TODO possibili metodi statici ??
 @Service
 public class EventEmailBuilderService {
-
+	
+	private static final String TIMEZONE_ECT = "ECT";
+	
 	@Autowired
 	private ApplicationProperties properties;
 	
@@ -71,8 +73,8 @@ public class EventEmailBuilderService {
 
 		templateData.put("creator", String.format("%s %s", event.getEventCreator().getNome(), event.getEventCreator().getCognome()));
 		templateData.put("eventType", event.getType());
-		templateData.put("dataInizio", Utils.formatDate(event.getStartDate(), TimeZone.getTimeZone("ECT").toZoneId()));
-		templateData.put("dataFine", Utils.formatDate(event.getEndDate(), TimeZone.getTimeZone("ECT").toZoneId()));
+		templateData.put("dataInizio", Utils.formatDate(event.getStartDate(), TimeZone.getTimeZone(TIMEZONE_ECT).toZoneId()));
+		templateData.put("dataFine", Utils.formatDate(event.getEndDate(), TimeZone.getTimeZone(TIMEZONE_ECT).toZoneId()));
 		templateData.put("partecipanti", recipients);
 		templateData.put("azione", azione);
 		templateData.put("presenza", event.getInPerson().booleanValue());
@@ -100,7 +102,7 @@ public class EventEmailBuilderService {
 		Map<String, Object> templateData = new HashMap<>();
 		templateData.put("creator", String.format("%s %s", event.getEventCreator().getNome(), event.getEventCreator().getCognome()));
 		templateData.put("eventType", event.getType());
-		templateData.put("dataInizio", Utils.formatDate(event.getStartDate(), TimeZone.getTimeZone("ECT").toZoneId()));
+		templateData.put("dataInizio", Utils.formatDate(event.getStartDate(), TimeZone.getTimeZone(TIMEZONE_ECT).toZoneId()));
 		templateData.put("partecipanti", recipients);
 
 		return Email.builder().eventId(event.getId()).from(properties.getEmailSender())
