@@ -21,7 +21,7 @@ public class ScheduledEventRepositoryService {
 	}
 	
 	public ScheduledEvent getById(String id) {
-		return repo.findById(id).get();
+		return repo.findById(id).orElseThrow();
 	}
 
 	public void deleteJobById(String id) {
