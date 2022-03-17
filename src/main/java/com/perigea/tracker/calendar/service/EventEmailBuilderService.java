@@ -77,7 +77,7 @@ public class EventEmailBuilderService {
 		templateData.put("dataFine", Utils.formatDate(event.getEndDate(), TimeZone.getTimeZone(TIMEZONE_ECT).toZoneId()));
 		templateData.put("partecipanti", recipients);
 		templateData.put("azione", azione);
-		templateData.put("presenza", event.getInPerson().booleanValue());
+		templateData.put("presenza", event.getInPerson());
 
 		return Email.builder().eventId(event.getId()).from(properties.getEmailSender())
 				.templateName(EmailTemplates.MEETING_TEMPLATE.getDescrizione()).templateModel(templateData)
