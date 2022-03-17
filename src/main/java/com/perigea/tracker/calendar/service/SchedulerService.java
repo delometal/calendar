@@ -53,7 +53,7 @@ public class SchedulerService {
 		}
 
 		ScheduledEvent info = ScheduledEvent.builder().email(email).id(detail.getKey().getName())
-				.nextFireTime(dataEsecuzione).tipo(TipoScheduleEvent.ISTANTANEA.name()).status(EventStatus.Active)
+				.nextFireTime(dataEsecuzione).tipo(TipoScheduleEvent.ISTANTANEA.name()).status(EventStatus.ACTIVE)
 				.build();
 		repositoryService.save(info);
 		return info;
@@ -78,7 +78,7 @@ public class SchedulerService {
 
 		ScheduledEvent info = ScheduledEvent.builder().email(email).id(detail.getKey().getName())
 				.nextFireTime(trigger.getNextFireTime()).cron(cron).tipo(TipoScheduleEvent.PERIODICO.name())
-				.expiration(expiration).status(EventStatus.Active).build();
+				.expiration(expiration).status(EventStatus.ACTIVE).build();
 		repositoryService.save(info);
 		return info;
 	}
@@ -93,7 +93,7 @@ public class SchedulerService {
 			JobKey key = new JobKey(id, "calendar");
 			ScheduledEvent event = repositoryService.getById(id);
 			scheduler.pauseJob(key);
-			event.setStatus(EventStatus.Paused);
+			event.setStatus(EventStatus.PAUSED);
 			repositoryService.save(event);
 			return "ScheduleEvent paused";
 		} catch (Exception e) {
@@ -109,13 +109,13 @@ public class SchedulerService {
 	 */
 	public ScheduledEvent resumeNotification(String id) {
 		try {
-			ScheduledEvent event = repositoryService.getByStatusAndId(EventStatus.Paused, id);
+			ScheduledEvent event = repositoryService.getByStatusAndId(EventStatus.PAUSED, id);
 			JobKey jobKey = new JobKey(id, "calendar");
 			if (!scheduler.checkExists(jobKey)) {
 				return null;
 			}
 			scheduler.resumeJob(jobKey);
-			event.setStatus(EventStatus.Active);
+			event.setStatus(EventStatus.ACTIVE);
 			repositoryService.save(event);
 			return event;
 		} catch (Exception e) {
@@ -133,7 +133,7 @@ public class SchedulerService {
 			JobKey key = new JobKey(id, "calendar");
 //			repositoryService.deleteJobById(id);
 			ScheduledEvent event = repositoryService.getById(id);
-			event.setStatus(EventStatus.Inactive);
+			event.setStatus(EventStatus.INACTIVE);
 			repositoryService.save(event);
 			return scheduler.deleteJob(key);
 		} catch (Exception e) {
@@ -161,7 +161,7 @@ public class SchedulerService {
 			scheduler.rescheduleJob(triggerKey, trigger);
 			logger.info(String.format("Notifica rischedulata in data %s", nuovaData));
 			ScheduledEvent info = ScheduledEvent.builder().email(email).id(detail.getKey().getName())
-					.nextFireTime(nuovaData).tipo(TipoScheduleEvent.ISTANTANEA.name()).status(EventStatus.Active)
+					.nextFireTime(nuovaData).tipo(TipoScheduleEvent.ISTANTANEA.name()).status(EventStatus.ACTIVE)
 					.build();
 			repositoryService.save(info);
 			return info;
@@ -191,7 +191,7 @@ public class SchedulerService {
 
 			ScheduledEvent info = ScheduledEvent.builder().email((Email) detail.getJobDataMap().get("email"))
 					.id(detail.getKey().getName()).cron(cron).tipo(TipoScheduleEvent.PERIODICO.name())
-					.status(EventStatus.Active).build();
+					.status(EventStatus.ACTIVE).build();
 			repositoryService.save(info);
 			return info;
 		} catch (Exception e) {
@@ -203,7 +203,7 @@ public class SchedulerService {
 	 * metodo per la rischedulazione di tutti gli eventi attivi al riavvio della macchina
 	 */
 	public void rescheduleAvvio() {
-		List<ScheduledEvent> infos = repositoryService.getAllByStatus(EventStatus.Active);
+		List<ScheduledEvent> infos = repositoryService.getAllByStatus(EventStatus.ACTIVE);
 		repositoryService.deleteAll(infos);
 		try {
 			for (ScheduledEvent scheduledInfo : infos) {

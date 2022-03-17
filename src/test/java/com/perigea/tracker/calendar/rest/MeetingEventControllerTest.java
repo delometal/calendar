@@ -73,12 +73,12 @@ public class MeetingEventControllerTest {
 		secondContact.setCodicePersona("MoreUniqueID");
 		
 		event1.setEventCreator(contact);
-		event1.setType(CalendarEventType.Riunione);
+		event1.setType(CalendarEventType.RIUNIONE);
 		event1.setId("VeryUniqueID");
 		event1.setStartDate(LocalDateTime.now());
 		
 		event2.setEventCreator(secondContact);
-		event2.setType(CalendarEventType.Riunione);
+		event2.setType(CalendarEventType.RIUNIONE);
 		event2.setId("randomID");
 		
 		events.add(event1);

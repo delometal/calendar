@@ -146,7 +146,7 @@ public class MeetingEventService {
 	 * @return
 	 */
 	public boolean acceptInvite(String meetingId, String participantId) {
-		return changeInviteStatus(meetingId, participantId, ParticipationStatus.Confermata);
+		return changeInviteStatus(meetingId, participantId, ParticipationStatus.CONFERMATA);
 	}
 	
 	/**
@@ -156,7 +156,7 @@ public class MeetingEventService {
 	 * @return
 	 */
 	public boolean declineInvite(String meetingId, String participantId) {
-		return changeInviteStatus(meetingId, participantId, ParticipationStatus.Non_confermata);
+		return changeInviteStatus(meetingId, participantId, ParticipationStatus.NON_CONFERMATA);
 	}
 	
 	/**

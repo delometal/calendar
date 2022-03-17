@@ -27,7 +27,7 @@ public class ArchivingService {
 	 */
 	@Scheduled(cron = "* 0 0 1 1 *")
 	public void archiveInactiveScheduleEvent() {
-		List<ScheduledEvent> inactiveScheduledEvents = repositoryService.getAllByStatus(EventStatus.Inactive);
+		List<ScheduledEvent> inactiveScheduledEvents = repositoryService.getAllByStatus(EventStatus.INACTIVE);
 		for (ScheduledEvent event : inactiveScheduledEvents) {
 			ArchivedEvent archive = new ArchivedEvent();
 			archive.setId(event.getId());

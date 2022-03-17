@@ -44,7 +44,6 @@ public class MeetingEvent extends CalendarEvent {
 	@Field
 	private String link;
 	
-		
 	@NotNull
 	@Field
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Utils.DATE_FORMAT, timezone = "Europe/Rome")
@@ -56,7 +55,7 @@ public class MeetingEvent extends CalendarEvent {
 	private LocalDateTime endDate;
 	
 	public MeetingEvent() {
-		this.setType(CalendarEventType.Riunione);
+		this.setType(CalendarEventType.RIUNIONE);
 	}
 
 }

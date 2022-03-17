@@ -265,7 +265,7 @@ public class EventEmailBuilderService {
 	public AttachmentDto addICSFile(MeetingEventDto event) {
 		AttachmentDto attch = new AttachmentDto();
 		attch.setBArray(ICSFactory.createICS(event));
-		attch.setMIMEType("text/calendar");
+		attch.setMimeType("text/calendar");
 		attch.setFilename("meeting.ics");
 		return attch;
 	}
@@ -305,7 +305,7 @@ public class EventEmailBuilderService {
 			String MIMEType = Utils.getMIMEType(pathPart[lenght - 1]);
 			String filename = pathFinalPart[pathFinalPart.length - 1];
 			AttachmentDto attch = new AttachmentDto();
-			attch.setMIMEType(MIMEType);
+			attch.setMimeType(MIMEType);
 			attch.setFilename(filename);
 			attch.setBArray(bArray);
 			attachments.add(attch);
@@ -323,7 +323,7 @@ public class EventEmailBuilderService {
 		AttachmentDto attachmentZip = new AttachmentDto();
 		byte[] zip = Utils.zipMultipleFiles(files);
 
-		attachmentZip.setMIMEType("application/zip");
+		attachmentZip.setMimeType("application/zip");
 		attachmentZip.setBArray(zip);
 		attachmentZip.setFilename("Aggregation.zip");
 

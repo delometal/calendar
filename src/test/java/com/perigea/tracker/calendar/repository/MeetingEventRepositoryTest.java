@@ -42,11 +42,11 @@ class MeetingEventRepositoryTest {
 		secondContact.setCodicePersona("MoreUniqueID");
 		
 		event.setEventCreator(contact);
-		event.setType(CalendarEventType.Riunione);
+		event.setType(CalendarEventType.RIUNIONE);
 		event.setId("VeryUniqueID");
 		
 		secondEvent.setEventCreator(secondContact);
-		secondEvent.setType(CalendarEventType.Riunione);
+		secondEvent.setType(CalendarEventType.RIUNIONE);
 		secondEvent.setId("randomID");
 		
 		repository.save(event);
