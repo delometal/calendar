@@ -1,5 +1,6 @@
 package com.perigea.tracker.calendar.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
@@ -19,10 +20,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 @Document (collection = "scheduled_event")
-public class ScheduledEvent {
+public class ScheduledEvent implements Serializable{
 	
-	
-	
+	private static final long serialVersionUID = -1079361041861609552L;
+
 	@Field
 	@Id
 	private String id;
