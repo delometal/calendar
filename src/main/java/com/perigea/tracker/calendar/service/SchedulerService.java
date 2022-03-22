@@ -71,7 +71,7 @@ public class SchedulerService {
 		Trigger trigger = buildCronJobTrigger(detail, cron);
 		try {
 			Date nextFire = scheduler.scheduleJob(detail, trigger);
-			logger.info(String.format("Notifica periodica in data: ", nextFire));
+			logger.info(String.format("Notifica periodica in data: %s", nextFire));
 		} catch (Exception e) {
 			throw new NotificationSchedulerException(e.getMessage());
 		}
