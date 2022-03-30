@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.perigea.tracker.calendar.entity.MeetingEvent;
 import com.perigea.tracker.calendar.mapper.MeetingMapper;
 import com.perigea.tracker.calendar.model.Contact;
+import com.perigea.tracker.calendar.repository.MeetingEventRepository;
 import com.perigea.tracker.calendar.service.EventEmailBuilderService;
 import com.perigea.tracker.calendar.service.MeetingEventService;
 import com.perigea.tracker.calendar.service.MeetingRoomService;
@@ -39,6 +40,8 @@ public class MeetingEventControllerTest {
 	
 	@MockBean
 	private MeetingEventService mockService;
+	@MockBean
+	private MeetingEventRepository repository;
 	@MockBean
 	private SchedulerService schedulerService;
 	@MockBean
