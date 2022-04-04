@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.perigea.tracker.calendar.configuration.ApplicationProperties;
 import com.perigea.tracker.calendar.factory.ICSFactory;
 import com.perigea.tracker.commons.dto.AttachmentDto;
+import com.perigea.tracker.commons.dto.AvvisoBachecaDto;
 import com.perigea.tracker.commons.dto.ContactDto;
 import com.perigea.tracker.commons.dto.CreatedUtenteNotificaDto;
 import com.perigea.tracker.commons.dto.HolidayEventDto;
@@ -211,6 +212,22 @@ public class EventEmailBuilderService {
 				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipient).build();
 	}
 	
+
+	public Email build(AvvisoBachecaDto avviso) {
+		Map<String, Object> templateData = new HashMap<>();
+		try {
+			templateData.put("type", avviso.getTipo());
+			templateData.put("descrizione", avviso.getDescription());
+			templateData.put("dataEvento", Utils.convertToLocalDateTimeViaInstant(avviso.getDataEvento()));
+		} catch (Exception ex) {
+			throw new URIException(ex.getMessage());
+		}
+		return Email.builder().eventId(avviso.getId().toString()).from(properties.getEmailSender())
+				.templateName(EmailTemplates.DASHBOARD_NOTICE_TEMPLATE.getDescrizione()).templateModel(templateData)
+				.subject(String.format("Nuovo avviso %s in bacheca", avviso.getTipo()))
+				.emailType(EmailType.HTML_TEMPLATE_MAIL).to(avviso.getRecipients()).build();
+	}
+	
 	/**
 	 * creazione email per le credenziali di un utente
 	 * @param userCredential
@@ -328,7 +345,6 @@ public class EventEmailBuilderService {
 		attachmentZip.setFilename("Aggregation.zip");
 
 		return attachmentZip;
-
 	}
 
 }

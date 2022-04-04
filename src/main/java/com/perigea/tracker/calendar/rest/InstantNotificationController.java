@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.perigea.tracker.calendar.service.EventEmailBuilderService;
 import com.perigea.tracker.calendar.service.SchedulerService;
+import com.perigea.tracker.commons.dto.AvvisoBachecaDto;
 import com.perigea.tracker.commons.dto.CreatedUtenteNotificaDto;
 import com.perigea.tracker.commons.dto.NonPersistedEventDto;
 import com.perigea.tracker.commons.exception.NullFieldException;
@@ -43,6 +44,18 @@ public class InstantNotificationController {
 		Email reminder = emailBuilder.buildReminder(userCredential);
 		Date nextFire = Utils.shifTimeByHour(userCredential.getDataScadenza(), Utils.CREDENTIAL_EXPIRATION_SHIFT_AMOUNT);
 		scheduler.scheduleNotifica(nextFire, reminder);
+		return ResponseEntity.ok("OK");
+	}
+	
+	@PostMapping(path = "/dashboard-notification")
+	public ResponseEntity<String> notificaBacheca(@RequestBody NonPersistedEventDto<AvvisoBachecaDto> avviso){
+		String data = avviso.getData();
+		AvvisoBachecaDto avvisoDto = Utils.toObject(data, avviso.getClazz());
+		if (!NotNullValidator.validate(avvisoDto)) {
+			throw new NullFieldException(String.format("%s must not be null!", NotNullValidator.getDetails(avvisoDto)));
+		}
+		Email message = emailBuilder.build(avvisoDto);
+		notificator.send(message);
 		return ResponseEntity.ok("OK");
 	}
 	
