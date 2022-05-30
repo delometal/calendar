@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.perigea.tracker.calendar.entity.TimesheetEvent;
+import com.perigea.tracker.calendar.entity.TimesheetReferences;
 import com.perigea.tracker.calendar.repository.TimesheetEventRepository;
 import com.perigea.tracker.commons.enums.ApprovalStatus;
 import com.perigea.tracker.commons.exception.EntityNotFoundException;
@@ -64,6 +65,22 @@ public class TimesheetEventService {
 	public List<TimesheetEvent> findAllByEventCreator(String mailAziendaleCreator) {
 		try {
 			return timesheetRepository.findAllByEventCreator(mailAziendaleCreator);
+		} catch (Exception ex) {
+			if (ex instanceof NoSuchElementException) {
+				throw new EntityNotFoundException(ex.getMessage());
+			}
+			throw new TimesheetEventException(ex.getMessage());
+		}
+	}
+	
+	/**
+	 * ricerca attraverso le referenze del timesheet
+	 * @param refs
+	 * @return
+	 */
+	public List<TimesheetEvent> findByTimesheetReferences(TimesheetReferences refs) {
+		try {
+			return timesheetRepository.findByTimesheetRefs(refs);
 		} catch (Exception ex) {
 			if (ex instanceof NoSuchElementException) {
 				throw new EntityNotFoundException(ex.getMessage());

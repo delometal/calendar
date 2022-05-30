@@ -1,5 +1,7 @@
 package com.perigea.tracker.calendar.entity;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -31,9 +33,16 @@ public class TimesheetEvent extends CalendarEvent {
 
 	@Field
 	private ApprovalStatus approvalStatus;
+	
+	@Field
+//	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+//	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	private LocalDateTime date;
 
 	public TimesheetEvent(CalendarEventType type) {
 		this.setType(type);
 		this.setApprovalStatus(ApprovalStatus.PENDING);
+		
+		
 	}
 }
