@@ -128,7 +128,7 @@ public class EventEmailBuilderService {
 		templateData.put("eventType", event.getType());
 		templateData.put("azione", azione);
 		templateData.put("mese", mese.getDescription());
-		templateData.put("anno", event.getTimesheet().getAnno());
+		templateData.put("anno", event.getTimesheet().getAnno().toString());
 
 		return Email.builder().eventId(event.getId()).from(properties.getEmailSender())
 				.templateName(EmailTemplates.TIMESHEET_TEMPLATE.getDescrizione()).templateModel(templateData)

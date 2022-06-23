@@ -97,6 +97,7 @@ public class TimesheetEventController {
 				HttpStatus.OK);
 	}
 	
+	//FIXME da fixare con le aggregation di mongo
 	@GetMapping(value = "/get-last-by-refs/{anno}/{mese}/{codicePersona}")
 	public ResponseEntity<ResponseDto<TimesheetEventDto>> findAllByReferences(@PathVariable Integer anno,
 			@PathVariable Integer mese, @PathVariable String codicePersona) {
