@@ -253,6 +253,23 @@ public class EventEmailBuilderService {
 				.subject("Attivazione credenziali").emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).build();
 	}
 	
+	public Email buildRecover(CreatedUtenteNotificaDto userInfo) {
+		Map<String, Object> templateData = new HashMap<>();
+		List<String> recipients = new ArrayList<>();
+		try {
+			recipients.add(userInfo.getMailAziendale());
+
+			templateData.put("codice_recupero", userInfo.getPassword());
+			templateData.put("scadenza", userInfo.getDataScadenza());
+			templateData.put("link", new URI(properties.getPasswordUpdateEndpoint()));
+		} catch (Exception ex) {
+			throw new URIException(ex.getMessage());
+		}
+		return Email.builder().eventId(UUID.randomUUID().toString()).from(properties.getEmailSender())
+				.templateName(EmailTemplates.RECOVER_PASSWORD_TEMPLATE.getDescrizione()).templateModel(templateData)
+				.subject("Attivazione credenziali").emailType(EmailType.HTML_TEMPLATE_MAIL).to(recipients).build();
+	}
+	
 	/**
 	 * email per il reminder per l'aggiornamento delle credenziali di un utente
 	 * @param data

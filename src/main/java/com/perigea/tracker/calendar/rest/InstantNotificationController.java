@@ -42,8 +42,20 @@ public class InstantNotificationController {
 		Email message = emailBuilder.build(userCredential);
 		notificator.send(message);
 		Email reminder = emailBuilder.buildReminder(userCredential);
-		Date nextFire = Utils.shifTimeByHour(userCredential.getDataScadenza(), Utils.CREDENTIAL_EXPIRATION_SHIFT_AMOUNT);
+		Date nextFire = Utils.shifTimeByHour(userCredential.getDataScadenza(), Utils.RECOVER_CREDENTIAL_EXPIRATION_SHIFT_AMOUNT);
 		scheduler.scheduleNotifica(nextFire, reminder);
+		return ResponseEntity.ok("OK");
+	}
+	
+	@PostMapping(path = "/recover-password")
+	public ResponseEntity<String> notificaRecuperoPassword(@RequestBody NonPersistedEventDto<CreatedUtenteNotificaDto> notifica) {
+		String data = notifica.getData();
+		CreatedUtenteNotificaDto userInfo = Utils.toObject(data, notifica.getClazz());
+		if (!NotNullValidator.validate(userInfo)) {
+			throw new NullFieldException(String.format("%s must not be null!", NotNullValidator.getDetails(userInfo)));
+		}
+		Email message = emailBuilder.buildRecover(userInfo);
+		notificator.send(message);
 		return ResponseEntity.ok("OK");
 	}
 	
