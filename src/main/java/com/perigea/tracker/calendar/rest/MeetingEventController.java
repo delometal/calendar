@@ -3,6 +3,7 @@ package com.perigea.tracker.calendar.rest;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,8 +66,11 @@ public class MeetingEventController {
 			MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<ResponseDto<MeetingEventDto>> addMeeting(@RequestPart("event") MeetingEventDto meetingEvent,
 			@RequestParam("files") MultipartFile[] files) throws IllegalStateException, IOException {
-
-		List<File> filesList = Utils.getFileList(files);
+		
+		List<File> filesList = new ArrayList<>();
+		if (files != null) {
+			filesList = Utils.getFileList(files);
+		}
 
 		MeetingEvent event = mapper.mapToEntity(meetingEvent);
 		Email email = emailBuilder.build(meetingEvent, "creato", filesList);
